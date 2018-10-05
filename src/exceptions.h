@@ -15,5 +15,15 @@ public:
     explicit ArgumentException(const std::string &__arg);
 };
 
+class SSLException : public ApplicationException {
+public:
+    explicit SSLException(const std::string &__arg);
+};
+
+class UrlException : public ApplicationException {
+public:
+    explicit UrlException(const std::string &__arg);
+};
+
 
 #endif //ISA_EXCEPTIONS_H

@@ -1,8 +1,9 @@
 #include <iostream>
-#include <string>
 #include <getopt.h>
 
 #include "exceptions.h"
+#include "SSLWrapper.h"
+#include "Url.h"
 
 using namespace std;
 
@@ -11,10 +12,9 @@ typedef struct {
     string feedfile;
     string certfile;
     string certaddr;
-    bool show_time;
-    bool show_author;
-    bool show_url;
-    bool help;
+    bool show_time{};
+    bool show_author{};
+    bool show_url{};
 } Params;
 
 Params get_params(int argc, char** argv);
@@ -26,14 +26,22 @@ int main(int argc, char** argv) {
     try {
         params = get_params(argc, argv);
     } catch (const ArgumentException &e) {
-        cerr << "Argument error: " << e.what() << endl;
-        return 1;
-    }
-
-    if (params.help) {
+        cerr << "Argument error: " << e.what() << endl << endl;
         print_help(argv[0]);
         return 1;
     }
+
+    SSLWrapper::init();
+
+    auto* connection = new SSLWrapper();
+    connection->connect("www.fit.vutbr.cz:80");
+    connection->write("GET /news/news-rss.php HTTP/1.1\nHost: www.fit.vutbr.cz\n\n");
+//    cout << connection->read(4096) << endl;
+
+    Url url{};
+    url.from_string(params.url);
+    url.validate();
+    cout << url.get_protocol() << " " << url.get_hostname() << " " << url.get_port() << " " << url.get_path() << endl;
 
     return 0;
 }
@@ -42,8 +50,7 @@ Params get_params(int argc, char** argv) {
     Params params{};
 
     if (argc == 1) {
-        params.help = true;
-        return params;
+        throw ArgumentException("Required arguments missing");
     }
 
     int opt;
@@ -116,14 +123,14 @@ Params get_params(int argc, char** argv) {
 }
 
 void print_help(const string &exe_name) {
-    cout << "Usage:" << endl;
-    cout << " " << exe_name << " <URL | -f <feedfile>> [-c <cerfile>] [-C <certaddr>] [-T] [-a] [-u]" << endl << endl;
-    cout << "Downloads given RSS or Atom feed and prints information to standard output." << endl << endl;
-    cout << "Options:" << endl;
-    cout << " -f <feedfile>   file with multiple URLs to RSS or Atom feed" << endl;
-    cout << " -c <certfile>   file with certificates used to check SSL/TLS certificate validity" << endl;
-    cout << " -C <certaddr>   scans given directory for certificates for SSL/TLS certificate validity check" << endl;
-    cout << " -T              show information about creation or modification time of record (if available)" << endl;
-    cout << " -a              show author or his e-mail address (if available)" << endl;
-    cout << " -u              show asociated URL to each record (if available)" << endl;
+    cerr << "Usage:" << endl;
+    cerr << " " << exe_name << " <URL | -f <feedfile>> [-c <cerfile>] [-C <certaddr>] [-T] [-a] [-u]" << endl << endl;
+    cerr << "Downloads given RSS or Atom feed and prints information to standard output." << endl << endl;
+    cerr << "Options:" << endl;
+    cerr << " -f <feedfile>   file with multiple URLs to RSS or Atom feed" << endl;
+    cerr << " -c <certfile>   file with certificates used to check SSL/TLS certificate validity" << endl;
+    cerr << " -C <certaddr>   scans given directory for certificates for SSL/TLS certificate validity check" << endl;
+    cerr << " -T              show information about creation or modification time of record (if available)" << endl;
+    cerr << " -a              show author or his e-mail address (if available)" << endl;
+    cerr << " -u              show asociated URL to each record (if available)" << endl;
 }
