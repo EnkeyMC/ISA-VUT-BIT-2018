@@ -1,0 +1,4 @@
+NAME=Invalid URL argument
+ARGS=http://www.url.com:dfsa/dfa
+RC=1
+CHECK_OUTPUT=1
