@@ -34,9 +34,10 @@ int main(int argc, char** argv) {
     SSLWrapper::init();
 
     auto* connection = new SSLWrapper();
-    connection->connect("www.fit.vutbr.cz:80");
-    connection->write("GET /news/news-rss.php HTTP/1.1\nHost: www.fit.vutbr.cz\n\n");
-//    cout << connection->read(4096) << endl;
+    connection->setup_ssl();
+    connection->connect("xkcd.com/atom.xml:80");
+    connection->write("GET /atom.xml HTTP/1.1\nHost: xkcd.com\n\n");
+    cout << connection->read(4096) << endl;
 
     Url url{};
     url.from_string(params.url);

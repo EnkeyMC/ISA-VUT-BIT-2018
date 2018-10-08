@@ -1,0 +1,4 @@
+NAME=URL and feedfile at the same time
+ARGS=-f"file" www.url.com
+RC=1
+CHECK_OUTPUT=0

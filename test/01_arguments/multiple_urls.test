@@ -1,0 +1,4 @@
+NAME=Multiple URL arguments
+ARGS=www.orl.com www.url.cz -a www.nic.cz
+RC=1
+CHECK_OUTPUT=0

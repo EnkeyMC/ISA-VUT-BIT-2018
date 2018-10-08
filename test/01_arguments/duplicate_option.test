@@ -1,0 +1,4 @@
+NAME=Option -a specified multiple times
+ARGS=www.url.com/feed.xml -a -T -a
+RC=1
+CHECK_OUTPUT=0

@@ -1,0 +1,4 @@
+NAME=Invalid argument
+ARGS=-x www.url.com
+RC=1
+CHECK_OUTPUT=0

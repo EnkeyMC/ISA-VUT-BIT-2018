@@ -3,6 +3,8 @@
 #define ISA_SSLWRAPER_H
 
 #include <string>
+#include <openssl/ossl_typ.h>
+#include <openssl/ssl.h>
 
 using std::string;
 
@@ -51,10 +53,21 @@ public:
      */
     void write(const string &msg);
 
+    /**
+     * Setup SSL for connection
+     * @param ca file with certificates
+     * @param file if true, ca is file, otherwise directory
+     */
+    void setup_ssl(const string &ca = "", bool file = true);
+
 private:
     BIO * bio;
+    SSL_CTX * ssl_ctx;
+    SSL * ssl;
     string hostname;
 
+    void connect_unsecure();
+    void connect_secure();
 };
 
 
