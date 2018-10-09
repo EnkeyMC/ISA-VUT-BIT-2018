@@ -2,7 +2,7 @@ EXEC=isa
 ZIP=xomach00.zip
 SOURCES=$(wildcard src/*)
 MISC_FILES=Makefile CMakeLists.txt
-TESTS=$(wildcard test/*)
+TESTS=$(shell find test -type f -regex ".*\(test\|out\)")
 
 run: compile
 	echo NYI
@@ -28,7 +28,7 @@ test: compile
 
 test-remote: pack
 	scp $(ZIP) xomach00@merlin.fit.vutbr.cz:~/isa/
-	ssh xomach00@merlin.fit.vutbr.cz cd isa && rm -rf test-tmp && mkdir test-tmp && unzip $(ZIP) -d test-tmp/ && cd test-tmp && make test
-	ssh xomach00@eva.fit.vutbr.cz cd isa/test-tmp &&  make test
+	ssh xomach00@merlin.fit.vutbr.cz 'cd isa/tmp && unzip ../$(ZIP) && make test'
+	ssh xomach00@eva.fit.vutbr.cz 'cd isa/tmp &&  make test'
 
 .PHONY: test pack
