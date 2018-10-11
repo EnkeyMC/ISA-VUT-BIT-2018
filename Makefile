@@ -5,7 +5,7 @@ MISC_FILES=Makefile CMakeLists.txt
 TESTS=$(shell find test -type f -regex ".*\(test\|out\)")
 
 run: compile
-	echo NYI
+	./$(EXEC) https://xkcd.com/atom.xml
 
 compile: cmake
 	echo NYI
@@ -28,7 +28,10 @@ test: compile
 
 test-remote: pack
 	scp $(ZIP) xomach00@merlin.fit.vutbr.cz:~/isa/
-	ssh xomach00@merlin.fit.vutbr.cz 'cd isa/tmp && unzip ../$(ZIP) && make test'
+	ssh xomach00@merlin.fit.vutbr.cz 'cd isa/tmp && unzip -o ../$(ZIP) && make test'
 	ssh xomach00@eva.fit.vutbr.cz 'cd isa/tmp &&  make test'
 
 .PHONY: test pack
+
+valgrind: compile
+	valgrind ./$(EXEC) https://xkcd.com/atom.xml

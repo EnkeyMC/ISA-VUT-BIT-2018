@@ -9,8 +9,9 @@
 
 void SSLWrapper::init() {
     SSL_load_error_strings();
+    SSL_library_init();
     ERR_load_BIO_strings();
-    OpenSSL_add_all_algorithms();
+//    OpenSSL_add_all_algorithms();
 }
 
 SSLWrapper::SSLWrapper() {
@@ -21,6 +22,10 @@ SSLWrapper::SSLWrapper() {
 }
 
 SSLWrapper::~SSLWrapper() {
+    FIPS_mode_set(0);
+    EVP_cleanup();
+    CRYPTO_cleanup_all_ex_data();
+    ERR_free_strings();
     BIO_free_all(this->bio);
     this->bio = nullptr;
     if (this->ssl_ctx != nullptr)
@@ -55,10 +60,13 @@ void SSLWrapper::close() {
 
 void SSLWrapper::setup_ssl(const string &ca, bool file) {
     this->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
+    if (this->ssl_ctx == nullptr)
+        throw SSLException(this->get_error_str());
 
-    if (ca.empty())
-        SSL_CTX_set_default_verify_paths(this->ssl_ctx); // TODO error checking
-    else {
+    if (ca.empty()) {
+        if (SSL_CTX_set_default_verify_paths(this->ssl_ctx) == 0)
+            throw SSLException(this->get_error_str());
+    } else {
         const char *cafile, *cadir;
         if (file) {
             cafile = ca.c_str();
@@ -69,7 +77,7 @@ void SSLWrapper::setup_ssl(const string &ca, bool file) {
         }
 
         if (!SSL_CTX_load_verify_locations(this->ssl_ctx, cafile, cadir)) {
-            // TODO handle error
+            throw SSLException(this->get_error_str());
         }
     }
 }
@@ -77,10 +85,10 @@ void SSLWrapper::setup_ssl(const string &ca, bool file) {
 void SSLWrapper::connect_unsecure() {
     this->bio = BIO_new_connect(hostname.c_str());
     if (this->bio == nullptr)
-        throw SSLException("Could not open connection to " + hostname);
+        throw SSLException("Could not open connection to " + hostname + " (Reason: " + this->get_error_str() + ")");
 
     if (BIO_do_connect(this->bio) <= 0)
-        throw SSLException("Could not connect to " + hostname);
+        throw SSLException("Could not connect to " + hostname + " (Reason: " + this->get_error_str() + ")");
 }
 
 void SSLWrapper::connect_secure() {
@@ -91,6 +99,14 @@ void SSLWrapper::connect_secure() {
     BIO_set_conn_hostname(this->bio, this->hostname.c_str());
 
     if (BIO_do_connect(this->bio) <= 0) {
-        // TODO handle error
+        throw SSLException("Could not connect to " + hostname + " (Reason: " + this->get_error_str() + ")");
     }
+}
+
+string SSLWrapper::get_error_str() {
+#ifdef NDEBUG
+    return string(ERR_reason_error_string(ERR_get_error()));
+#else
+    return string(ERR_error_string(ERR_get_error(), NULL));
+#endif
 }

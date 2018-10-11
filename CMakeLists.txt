@@ -3,7 +3,9 @@ project(isa)
 
 set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ")
+set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS}")
+
+SET(CMAKE_BUILD_TYPE Debug)
 
 find_package(OpenSSL REQUIRED)
 include_directories(${OPENSSL_INCLUDE_DIR})

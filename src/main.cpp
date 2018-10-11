@@ -4,6 +4,7 @@
 #include "exceptions.h"
 #include "SSLWrapper.h"
 #include "Url.h"
+#include "Http.h"
 
 using namespace std;
 
@@ -31,18 +32,19 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    SSLWrapper::init();
-
-    auto* connection = new SSLWrapper();
-    connection->setup_ssl();
-    connection->connect("xkcd.com/atom.xml:80");
-    connection->write("GET /atom.xml HTTP/1.1\nHost: xkcd.com\n\n");
-    cout << connection->read(4096) << endl;
-
     Url url{};
     url.from_string(params.url);
     url.validate();
-    cout << url.get_protocol() << " " << url.get_hostname() << " " << url.get_port() << " " << url.get_path() << endl;
+
+    SSLWrapper::init();
+    try {
+
+        SSLWrapper connection{};
+        cout << Http::request(&connection, url);
+    } catch (const SSLException &e) {
+        cerr << e.what() << endl;
+        exit(2);
+    }
 
     return 0;
 }

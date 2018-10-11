@@ -31,6 +31,8 @@ void Url::from_string(const string &url) {
         this->port = url.substr(port_pos + 1, path_pos - port_pos - 1);
     } else {
         this->hostname = url.substr(pos, path_pos - pos);
+        if (this->is_https())
+            this->port = "443";
     }
 
     if (path_pos != string::npos)
@@ -69,4 +71,8 @@ const string &Url::get_port() const {
 
 const string &Url::get_path() const {
     return this->path;
+}
+
+bool Url::is_https() const {
+    return this->protocol == "https";
 }

@@ -68,6 +68,8 @@ private:
 
     void connect_unsecure();
     void connect_secure();
+
+    string get_error_str();
 };
 
 

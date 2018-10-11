@@ -45,6 +45,12 @@ public:
      */
     const string & get_path() const;
 
+    /**
+     * Is protocol HTTPS
+     * @return true if protocol is HTTPS, false otherwise
+     */
+    bool is_https() const;
+
 private:
     string original;
 
