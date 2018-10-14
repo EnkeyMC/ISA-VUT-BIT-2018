@@ -40,7 +40,7 @@ void Url::from_string(const string &url) {
 }
 
 void Url::validate() const {
-    if (!std::regex_match(this->original, std::regex(R"(^([\w\d]+:\/\/)?[\w\d\.]+(:\d{1,5})?(\/.*)?$)")))
+    if (!std::regex_match(this->original, std::regex(R"(^([\w\d]+:\/\/)?[\w\d\.\-]+(:\d{1,5})?(\/.*)?$)")))
         throw UrlException("Url " + this->original + " is invalid");
 
     if (this->protocol != "http" && this->protocol != "https")

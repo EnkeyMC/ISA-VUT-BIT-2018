@@ -1,0 +1,4 @@
+NAME=Connection to Wikipedia
+ARGS=https://en.wikipedia.org/w/api.php?hidebots=1&days=7&limit=50&hidewikidata=1&action=feedrecentchanges&feedformat=atom
+RC=0
+CHECK_OUTPUT=0

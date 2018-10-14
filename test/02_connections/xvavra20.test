@@ -1,0 +1,4 @@
+NAME=Connection to http://www.stud.fit.vutbr.cz/~xvavra20/atom1.xml
+ARGS=http://www.stud.fit.vutbr.cz/~xvavra20/atom1.xml
+RC=0
+CHECK_OUTPUT=0

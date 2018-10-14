@@ -38,9 +38,8 @@ int main(int argc, char** argv) {
 
     SSLWrapper::init();
     try {
-
         SSLWrapper connection{};
-        cout << Http::request(&connection, url);
+        Http::get_request(&connection, url);
     } catch (const SSLException &e) {
         cerr << e.what() << endl;
         exit(2);

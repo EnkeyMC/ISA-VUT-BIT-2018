@@ -1,0 +1,4 @@
+NAME=Connection to https://www.theregister.co.uk/software/headlines.atom
+ARGS=https://www.theregister.co.uk/software/headlines.atom
+RC=0
+CHECK_OUTPUT=0

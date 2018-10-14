@@ -1,0 +1,4 @@
+NAME=Connection to https://xkcd.com/atom.xml
+ARGS=https://xkcd.com/atom.xml
+RC=0
+CHECK_OUTPUT=0

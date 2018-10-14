@@ -46,6 +46,9 @@ run_test() {
     else
         echo " ERROR"
         echo "    Expected RC: $rc, Actual RC: $actual_rc"
+        echo " STDERR:"
+        cat err.tmp
+        echo ""
     fi
 }
 

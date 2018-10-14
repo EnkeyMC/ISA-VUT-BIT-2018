@@ -1,0 +1,4 @@
+NAME=Connection to http://www.fit.vutbr.cz/news/news-rss.php
+ARGS=http://www.fit.vutbr.cz/news/news-rss.php
+RC=0
+CHECK_OUTPUT=0

@@ -5,6 +5,7 @@
 #include <string>
 #include <openssl/ossl_typ.h>
 #include <openssl/ssl.h>
+#include "Url.h"
 
 using std::string;
 
@@ -28,9 +29,9 @@ public:
 
     /**
      * Connect to host
-     * @param hostname
+     * @param url
      */
-    void connect(const string &hostname);
+    void connect(const Url &url);
 
     /**
      * Close connection
@@ -56,17 +57,23 @@ public:
     /**
      * Setup SSL for connection
      * @param ca file with certificates
-     * @param file if true, ca is file, otherwise directory
+     * @param cadir directory with certificates
      */
-    void setup_ssl(const string &ca = "", bool file = true);
+    void setup_ssl(const string &ca = "", const string &cadir);
+
+    /**
+     * Indicates there is more data to be read in buffer
+     * @return true if there is more data, false otherwise
+     */
+    bool should_retry() const;
 
 private:
     BIO * bio;
     SSL_CTX * ssl_ctx;
     SSL * ssl;
-    string hostname;
+    Url url;
 
-    void connect_unsecure();
+    void connect_insecure();
     void connect_secure();
 
     string get_error_str();

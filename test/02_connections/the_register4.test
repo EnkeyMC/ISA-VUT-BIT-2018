@@ -1,0 +1,4 @@
+NAME=Connection to https://www.theregister.co.uk/hardware/headlines.atom
+ARGS=https://www.theregister.co.uk/hardware/headlines.atom
+RC=0
+CHECK_OUTPUT=0

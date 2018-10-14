@@ -1,0 +1,4 @@
+NAME=Connection to https://tools.ietf.org/dailydose/dailydose_atom.xml
+ARGS=https://tools.ietf.org/dailydose/dailydose_atom.xml
+RC=0
+CHECK_OUTPUT=0

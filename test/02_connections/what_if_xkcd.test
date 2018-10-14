@@ -1,0 +1,4 @@
+NAME=Connection to https://what-if.xkcd.com/feed.atom
+ARGS=https://what-if.xkcd.com/feed.atom
+RC=0
+CHECK_OUTPUT=0
