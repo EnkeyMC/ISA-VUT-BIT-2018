@@ -1,0 +1,4 @@
+NAME=Server returns status code 408
+ARGS=https://httpbin.org/status/408
+RC=4
+CHECK_OUTPUT=0

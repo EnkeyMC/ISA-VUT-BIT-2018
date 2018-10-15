@@ -1,0 +1,4 @@
+NAME=Server returns status code 502
+ARGS=https://httpbin.org/status/502
+RC=4
+CHECK_OUTPUT=0

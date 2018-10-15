@@ -1,0 +1,4 @@
+NAME=Server returns status code 302
+ARGS=https://httpbin.org/status/302
+RC=3
+CHECK_OUTPUT=0

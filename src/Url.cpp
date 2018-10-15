@@ -76,3 +76,12 @@ const string &Url::get_path() const {
 bool Url::is_https() const {
     return this->protocol == "https";
 }
+
+const string &Url::get_original() const {
+    return this->original;
+}
+
+std::ostream &operator<<(std::ostream &os, const Url &url) {
+    os << url.get_original();
+    return os;
+}

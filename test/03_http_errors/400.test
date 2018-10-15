@@ -1,0 +1,4 @@
+NAME=Server returns status code 400
+ARGS=https://httpbin.org/status/400
+RC=4
+CHECK_OUTPUT=0

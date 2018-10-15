@@ -44,6 +44,11 @@ public:
      * @return URL path
      */
     const string & get_path() const;
+    /**
+     * Get original string for URL
+     * @return original string
+     */
+    const string & get_original() const;
 
     /**
      * Is protocol HTTPS
@@ -59,6 +64,8 @@ private:
     string port;
     string path;
 };
+
+std::ostream& operator<<(std::ostream &os, const Url &url);
 
 
 #endif //ISA_URL_H

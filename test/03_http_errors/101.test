@@ -1,0 +1,4 @@
+NAME=Server returns status code 101
+ARGS=https://httpbin.org/status/101
+RC=3
+CHECK_OUTPUT=0

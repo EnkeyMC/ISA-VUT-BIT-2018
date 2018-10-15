@@ -1,0 +1,4 @@
+NAME=Server returns status code 504
+ARGS=https://httpbin.org/status/504
+RC=4
+CHECK_OUTPUT=0

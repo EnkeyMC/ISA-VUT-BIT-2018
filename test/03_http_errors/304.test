@@ -1,0 +1,4 @@
+NAME=Server returns status code 304
+ARGS=https://httpbin.org/status/304
+RC=3
+CHECK_OUTPUT=0

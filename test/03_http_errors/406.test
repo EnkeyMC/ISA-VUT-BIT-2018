@@ -1,0 +1,4 @@
+NAME=Server returns status code 406
+ARGS=https://httpbin.org/status/406
+RC=4
+CHECK_OUTPUT=0

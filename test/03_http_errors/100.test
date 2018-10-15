@@ -1,0 +1,4 @@
+NAME=Server returns status code 100
+ARGS=https://httpbin.org/status/100
+RC=3
+CHECK_OUTPUT=0

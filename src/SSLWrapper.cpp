@@ -14,7 +14,7 @@ void SSLWrapper::init() {
 //    OpenSSL_add_all_algorithms();
 }
 
-SSLWrapper::SSLWrapper() {
+SSLWrapper::SSLWrapper(const string &ca, const string &cadir) : ca(ca), cadir(cadir) {
     this->bio = nullptr;
     this->ssl_ctx = nullptr;
     this->ssl = nullptr;
@@ -58,7 +58,7 @@ void SSLWrapper::close() {
     BIO_reset(this->bio);
 }
 
-void SSLWrapper::setup_ssl(const string &ca, const string &cadir) {
+void SSLWrapper::setup_ssl() {
     this->ssl_ctx = SSL_CTX_new(SSLv23_client_method());
     if (this->ssl_ctx == nullptr)
         throw SSLException(this->get_error_str());

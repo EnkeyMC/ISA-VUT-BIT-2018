@@ -1,10 +1,15 @@
 #include <iostream>
 #include <getopt.h>
+#include <vector>
+#include <fstream>
 
 #include "exceptions.h"
 #include "SSLWrapper.h"
 #include "Url.h"
 #include "Http.h"
+#include "utils.h"
+#include "Feed.h"
+#include "debug.h"
 
 using namespace std;
 
@@ -18,34 +23,63 @@ typedef struct {
     bool show_url{};
 } Params;
 
+void run_program(int argc, char** argv);
 Params get_params(int argc, char** argv);
 void print_help(const string &exe_name);
+vector<Url> parse_feedfile(const string &feedfile);
+void remove_comment(string &str);
+Feed get_feed(SSLWrapper *ssl, const Url &url);
 
 int main(int argc, char** argv) {
-    Params params;
-
     try {
-        params = get_params(argc, argv);
+        run_program(argc, argv);
     } catch (const ArgumentException &e) {
         cerr << "Argument error: " << e.what() << endl << endl;
         print_help(argv[0]);
         return 1;
-    }
-
-    Url url{};
-    url.from_string(params.url);
-    url.validate();
-
-    SSLWrapper::init();
-    try {
-        SSLWrapper connection{};
-        Http::get_request(&connection, url);
+    } catch (const UrlException &e) {
+        cerr << "Argument error: " << e.what() << endl << endl;
+        print_help(argv[0]);
+        return 1;
     } catch (const SSLException &e) {
         cerr << e.what() << endl;
-        exit(2);
+        return 2;
+    } catch (const UnsupportedHttpStatusException &e) {
+        cerr << e.what() << endl;
+        return 3;
+    } catch (const HttpException &e) {
+        cerr << e.what() << endl;
+        return 4;
+    } catch (const exception &e) {
+        cerr << e.what() << endl;
+        return 99;
     }
 
     return 0;
+}
+
+void run_program(int argc, char **argv) {
+    Params params;
+    vector<Url> urls{};
+
+    params = get_params(argc, argv);
+
+    if (params.feedfile.empty()) {
+        Url url{};
+        url.from_string(params.url);
+        url.validate();
+        urls.push_back(url);
+    } else {
+        urls = parse_feedfile(params.feedfile);
+    } debug(urls);
+
+    SSLWrapper::init();
+    SSLWrapper ssl{params.certfile, params.certaddr};
+    Feed feed;
+    for (const Url &url : urls) {
+        feed = get_feed(&ssl, url);
+        cout << feed << endl; // TODO error printing
+    }
 }
 
 Params get_params(int argc, char** argv) {
@@ -135,4 +169,47 @@ void print_help(const string &exe_name) {
     cerr << " -T              show information about creation or modification time of record (if available)" << endl;
     cerr << " -a              show author or his e-mail address (if available)" << endl;
     cerr << " -u              show asociated URL to each record (if available)" << endl;
+}
+
+vector<Url> parse_feedfile(const string &feedfile) {
+    ifstream file{feedfile};
+    string line;
+    Url url;
+    vector<Url> urls;
+
+    if (!file.is_open())
+        throw ArgumentException("File " + feedfile + " could not be opened");
+
+    while (getline(file, line)) {
+        remove_comment(line);
+        line = trim(line);
+        if (!line.empty()) {
+            url = Url();
+            url.from_string(line);
+
+            try {
+                url.validate();
+                urls.push_back(url);
+            } catch (const UrlException &e) {
+                cerr << "Ignoring URL " << line << ", error occurred: " << e.what() << endl;
+            }
+        }
+    }
+
+    return urls;
+}
+
+void remove_comment(string &str) {
+    size_t hash_pos = str.find(" #");
+    if (str.length() > 0 && str[0] == '#')
+        hash_pos = 0;
+
+    if (hash_pos != string::npos)
+        str.erase(hash_pos);
+}
+
+Feed get_feed(SSLWrapper *ssl, const Url &url) {
+    string content = Http::get_request(ssl, url);
+
+    return {};
 }

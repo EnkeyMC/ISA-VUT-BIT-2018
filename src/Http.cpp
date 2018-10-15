@@ -5,6 +5,8 @@
 #include <memory>
 
 #include "debug.h"
+#include "utils.h"
+#include "exceptions.h"
 
 #define READ_BUFF_LEN 1024
 #define CRLF "\r\n"
@@ -23,6 +25,11 @@ string Http::get_request(SSLWrapper *ssl, const Url &url){
     ssl->write(create_get_request(url));
     read_response(ssl, response);
     ssl->close();
+
+    if (response.status_code < 200 || (response.status_code > 200 && response.status_code < 400))
+        throw UnsupportedHttpStatusException("Unsupported HTTP response code: "+response.status_reason);
+    else if (response.status_code >= 400)
+        throw HttpException("Server returned error status code: "+response.status_reason);
 
     return std::move(response.content);
 }
@@ -50,16 +57,6 @@ void Http::read_response(SSLWrapper *ssl, HttpResponse &response) {
 
 
     debug(response);
-}
-
-static bool str_starts_with(const string &str, const string &prefix) {
-    return str.substr(0, prefix.length()) == prefix;
-}
-
-static string trim(const string &str) {
-    size_t start = str.find_first_not_of(" \t\r");
-    size_t end = str.find_last_not_of(" \t\r") + 1;
-    return str.substr(start, end - start);
 }
 
 void Http::parse_header(const string &header, HttpResponse &http_response) {

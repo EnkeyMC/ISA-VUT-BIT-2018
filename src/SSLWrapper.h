@@ -20,8 +20,10 @@ public:
 
     /**
      * Constructor
+     * @param ca file with certificates
+     * @param cadir directory with certificates
      */
-    SSLWrapper();
+    explicit SSLWrapper(const string &ca = "", const string &cadir = "");
     /**
      * Destructor
      */
@@ -56,10 +58,8 @@ public:
 
     /**
      * Setup SSL for connection
-     * @param ca file with certificates
-     * @param cadir directory with certificates
      */
-    void setup_ssl(const string &ca = "", const string &cadir);
+    void setup_ssl();
 
     /**
      * Indicates there is more data to be read in buffer
@@ -72,6 +72,8 @@ private:
     SSL_CTX * ssl_ctx;
     SSL * ssl;
     Url url;
+    const string ca;
+    const string cadir;
 
     void connect_insecure();
     void connect_secure();

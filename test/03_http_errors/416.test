@@ -1,0 +1,4 @@
+NAME=Server returns status code 416
+ARGS=https://httpbin.org/status/416
+RC=4
+CHECK_OUTPUT=0

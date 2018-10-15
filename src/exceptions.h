@@ -25,5 +25,15 @@ public:
     explicit UrlException(const std::string &__arg);
 };
 
+class HttpException : public ApplicationException {
+public:
+    explicit HttpException(const std::string &__arg);
+};
+
+class UnsupportedHttpStatusException : public HttpException {
+public:
+    explicit UnsupportedHttpStatusException(const std::string &__arg);
+};
+
 
 #endif //ISA_EXCEPTIONS_H
