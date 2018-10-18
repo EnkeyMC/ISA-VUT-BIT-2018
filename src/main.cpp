@@ -2,6 +2,7 @@
 #include <getopt.h>
 #include <vector>
 #include <fstream>
+#include <sstream>
 
 #include "exceptions.h"
 #include "SSLWrapper.h"
@@ -10,6 +11,7 @@
 #include "utils.h"
 #include "Feed.h"
 #include "debug.h"
+
 
 using namespace std;
 
