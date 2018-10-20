@@ -2,6 +2,7 @@ EXEC=isa
 ZIP=xomach00.zip
 SOURCES=$(wildcard src/*)
 MISC_FILES=Makefile CMakeLists.txt
+LIB_FILES=$(wildcard lib/*)
 TESTS=$(shell find test -type f -regex ".*\(test\|out\)")
 
 run: compile
@@ -21,7 +22,7 @@ clean:
 	rm -f $(ZIP)
 
 pack:
-	zip $(ZIP) $(SOURCES) $(MISC_FILES) $(TESTS)
+	zip $(ZIP) $(SOURCES) $(MISC_FILES) $(TESTS) $(LIB_FILES)
 
 test: compile
 	cd test && ./test.sh ../$(EXEC)

@@ -32,6 +32,7 @@ vector<Url> parse_feedfile(const string &feedfile);
 void remove_comment(string &str);
 Feed get_feed(SSLWrapper *ssl, const Url &url);
 
+
 int main(int argc, char** argv) {
     try {
         run_program(argc, argv);
@@ -212,6 +213,7 @@ void remove_comment(string &str) {
 
 Feed get_feed(SSLWrapper *ssl, const Url &url) {
     string content = Http::get_request(ssl, url);
-
-    return {};
+    Feed feed{};
+    feed.parse(content);
+    return feed;
 }

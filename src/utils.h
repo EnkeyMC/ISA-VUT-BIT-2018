@@ -6,6 +6,10 @@
 
 using std::string;
 
+namespace pugi {
+    class xml_node;
+}
+
 /**
  * Trim leading and trailing whitespaces
  * @param str string to trim
@@ -27,6 +31,8 @@ std::ostream& operator<<(std::ostream &os, const std::vector<T> &vector) {
         os << item << std::endl;
     return os;
 }
+
+std::ostream& operator<<(std::ostream &os, const pugi::xml_node &node);
 
 
 

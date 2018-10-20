@@ -108,6 +108,7 @@ string Http::create_get_request(const Url &url) {
 //    ostream << "Accept: text/xml" CRLF;
     ostream << "Connection: close" CRLF;
     ostream << "User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:59.0) Gecko/20100101 Firefox/59.0" CRLF;
+    ostream << "Cache-Control: no-cache, no-store, must-revalidate" CRLF;
     ostream << CRLF;
 
     return ostream.str();
