@@ -15,7 +15,7 @@
 using std::istringstream;
 using std::getline;
 
-string Http::get_request(SSLWrapper *ssl, const Url &url){
+string Http::get_request(SSLWrapper *ssl, const Url &url) {
     HttpResponse response{};
 
     if (url.is_https())
@@ -27,9 +27,9 @@ string Http::get_request(SSLWrapper *ssl, const Url &url){
     ssl->close();
 
     if (response.status_code < 200 || (response.status_code > 200 && response.status_code < 400))
-        throw UnsupportedHttpStatusException("Unsupported HTTP response code: "+response.status_reason);
+        throw UnsupportedHttpStatusException("Unsupported HTTP response code: " + response.status_reason);
     else if (response.status_code >= 400)
-        throw HttpException("Server returned error status code: "+response.status_reason);
+        throw HttpException("Server returned error status code: " + response.status_reason);
 
     return std::move(response.content);
 }
@@ -95,7 +95,7 @@ string Http::read_chunked_content(SSLWrapper *ssl, const string &content_start) 
 
         content << buffer.substr(0, chunk_size);
         buffer.erase(0, chunk_size + CRLF_LEN);
-    } while(chunk_size != 0);
+    } while (chunk_size != 0);
 
     return content.str();
 }

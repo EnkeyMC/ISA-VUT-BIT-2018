@@ -28,6 +28,11 @@ public:
 private:
     pugi::xml_node get_feed_node(const pugi::xml_document &doc) const;
     void parse_feed_title(const pugi::xml_node &feed_node);
+    void parse_entries(const pugi::xml_node &feed_node);
+    pugi::xml_object_range<pugi::xml_named_node_iterator> get_entry_iterator(const pugi::xml_node &feed_node) const;
+    string get_entry_title(const pugi::xml_node &entry_node) const;
+    string get_entry_time(const pugi::xml_node &entry_node) const;
+    string get_entry_url(const pugi::xml_node &entry_node) const;
 
     string title;
     vector<FeedEntry> entries;
