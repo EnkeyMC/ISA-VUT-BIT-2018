@@ -83,6 +83,9 @@ void Feed::parse_entries(const pugi::xml_node &feed_node) {
         feed_entry.title = this->get_entry_title(entry);
         feed_entry.time = this->get_entry_time(entry);
         feed_entry.url = this->get_entry_url(entry);
+        feed_entry.author = this->get_entry_author(entry);
+
+        this->entries.push_back(feed_entry);
     }
 }
 
@@ -112,4 +115,15 @@ string Feed::get_entry_url(const pugi::xml_node &entry_node) const {
     if (url_node.text())
         return url_node.text().as_string();
     return url_node.attribute("href").as_string();
+}
+
+string Feed::get_entry_author(const pugi::xml_node &entry_node) const {
+    pugi::xml_node author_node;
+    if ((author_node = entry_node.child("dc:creator"))) {}
+    else if ((author_node = entry_node.child("author").child("name"))) {}  // TODO print name AND email?
+    else if ((author_node = entry_node.child("author").child("email"))) {}
+    else if ((author_node = entry_node.child("author"))) {}
+    else if ((author_node = entry_node.child("creator"))) {}
+
+    return author_node.text().as_string();
 }

@@ -33,6 +33,7 @@ private:
     string get_entry_title(const pugi::xml_node &entry_node) const;
     string get_entry_time(const pugi::xml_node &entry_node) const;
     string get_entry_url(const pugi::xml_node &entry_node) const;
+    string get_entry_author(const pugi::xml_node &entry_node) const;
 
     string title;
     vector<FeedEntry> entries;
