@@ -1,0 +1,4 @@
+NAME=Only URLs
+ARGS=-f resources/feedfile_urls_only.txt
+RC=0
+CHECK_OUTPUT=1

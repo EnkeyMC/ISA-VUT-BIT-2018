@@ -1,0 +1,4 @@
+NAME=Empty lines only in feedfile
+ARGS=-f resources/feedfile_empty_lines.txt
+RC=1
+CHECK_OUTPUT=0

@@ -1,0 +1,4 @@
+NAME=Basic Atom parsing
+ARGS=http://www.mocky.io/v2/5bd3027e3400000f00cfdfdb
+RC=0
+CHECK_OUTPUT=1

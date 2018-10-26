@@ -1,0 +1,4 @@
+NAME=Basic RSS 1.0 parsing
+ARGS=http://www.mocky.io/v2/5bc8c2f33200008f005a00ee
+RC=0
+CHECK_OUTPUT=1

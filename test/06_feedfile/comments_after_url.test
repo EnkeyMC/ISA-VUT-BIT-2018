@@ -1,0 +1,4 @@
+NAME=URLs with comments after them
+ARGS=-f resources/feedfile_comments_after_url.txt
+RC=0
+CHECK_OUTPUT=1

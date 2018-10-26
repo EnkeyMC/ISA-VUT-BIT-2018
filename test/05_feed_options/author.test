@@ -1,0 +1,4 @@
+NAME=Show author
+ARGS=http://www.mocky.io/v2/5bc8c2f33200008f005a00ee -a
+RC=0
+CHECK_OUTPUT=1

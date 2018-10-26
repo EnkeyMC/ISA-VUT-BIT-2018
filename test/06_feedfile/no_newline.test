@@ -1,0 +1,4 @@
+NAME=Only URLs, but no new line at the end of file
+ARGS=-f resources/feedfile_no_newline.txt
+RC=0
+CHECK_OUTPUT=1

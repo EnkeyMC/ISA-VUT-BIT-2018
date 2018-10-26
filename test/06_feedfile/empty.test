@@ -1,0 +1,4 @@
+NAME=Empty feedfile
+ARGS=-f resources/feedfile_empty.txt
+RC=1
+CHECK_OUTPUT=0

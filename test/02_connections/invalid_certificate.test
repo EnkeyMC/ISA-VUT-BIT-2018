@@ -1,0 +1,4 @@
+NAME=Program should fail if it can't verify certificate validity
+ARGS=https://what-if.xkcd.com/feed.atom -C /dev/null
+RC=2
+CHECK_OUTPUT=0

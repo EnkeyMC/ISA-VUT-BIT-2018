@@ -1,0 +1,4 @@
+NAME=Show time (param -T before URL)
+ARGS=-T http://www.mocky.io/v2/5bd3096a3400003600cfdff9
+RC=0
+CHECK_OUTPUT=1

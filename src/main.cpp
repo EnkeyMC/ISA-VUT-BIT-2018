@@ -93,64 +93,69 @@ Params get_params(int argc, char** argv) {
     }
 
     int opt;
-    opterr = 1;
+    opterr = 0;
 
-    while ((opt = getopt(argc, argv, "f:c:C:tau")) != -1) {
-        switch (opt) {
-            case 'f':
-                if (!params.feedfile.empty()) {
-                    throw ArgumentException("Option -f can only be present once");
-                }
-                params.feedfile = string(optarg);
-                break;
+    do {
+        while ((opt = getopt(argc, argv, "+:f:c:C:Tau")) != -1) {
+            switch (opt) {
+                case 'f':
+                    if (!params.feedfile.empty()) {
+                        throw ArgumentException("Option -f can only be present once");
+                    }
+                    params.feedfile = string(optarg);
+                    break;
 
-            case 'c':
-                if (!params.certfile.empty()) {
-                    throw ArgumentException("Option -c can only be present once");
-                }
-                params.certfile = string(optarg);
-                break;
+                case 'c':
+                    if (!params.certfile.empty()) {
+                        throw ArgumentException("Option -c can only be present once");
+                    }
+                    params.certfile = string(optarg);
+                    break;
 
-            case 'C':
-                if (!params.certaddr.empty()) {
-                    throw ArgumentException("Option -C can only be present once");
-                }
-                params.certaddr = string(optarg);
-                break;
+                case 'C':
+                    if (!params.certaddr.empty()) {
+                        throw ArgumentException("Option -C can only be present once");
+                    }
+                    params.certaddr = string(optarg);
+                    break;
 
-            case 't':
-                if (params.show_time) {
-                    throw ArgumentException("Option -t can only be present once");
-                }
-                params.show_time = true;
-                break;
+                case 'T':
+                    if (params.show_time) {
+                        throw ArgumentException("Option -t can only be present once");
+                    }
+                    params.show_time = true;
+                    break;
 
-            case 'a':
-                if (params.show_author) {
-                    throw ArgumentException("Option -a can only be present once");
-                }
-                params.show_author = true;
-                break;
+                case 'a':
+                    if (params.show_author) {
+                        throw ArgumentException("Option -a can only be present once");
+                    }
+                    params.show_author = true;
+                    break;
 
-            case 'u':
-                if (params.show_url) {
-                    throw ArgumentException("Option -u can only be present once");
-                }
-                params.show_url = true;
-                break;
+                case 'u':
+                    if (params.show_url) {
+                        throw ArgumentException("Option -u can only be present once");
+                    }
+                    params.show_url = true;
+                    break;
 
-            default:
-                throw ArgumentException("Invalid option");
+                case ':':
+                    throw ArgumentException("Missing option argument");
+
+                default:
+                    throw ArgumentException("Invalid option");
+            }
         }
-    }
 
-    for (int index = optind; index < argc; index++) {
-        if (!params.url.empty()) {
-            throw ArgumentException("You can specify only one URL");
+        if (optind < argc) {
+            if (!params.url.empty()) {
+                throw ArgumentException("You can specify only one URL");
+            }
+            params.url = string(argv[optind]);
+            optind++;
         }
-        params.url = string(argv[index]);
-    }
-
+    } while (optind < argc);
 
     if (params.url.empty() && params.feedfile.empty()) {
         throw ArgumentException("You have to specify URL or feedfile (option -f)");

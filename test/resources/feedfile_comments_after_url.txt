@@ -1,0 +1,6 @@
+http://www.mocky.io/v2/5bd322133400005800cfe081 # comment
+http://www.mocky.io/v2/5bd322133400005800cfe081#notacomment
+http://www.mocky.io/v2/5bd322133400005800cfe081#notacomment #this is comment
+http://www.mocky.io/v2/5bd322133400005800cfe081 # comment with hash #
+
+# another comment with #

@@ -7,6 +7,8 @@ fi
 
 executable=$1
 
+nsucctest=""
+
 get_test_file_key_val() {
     grep "^$2=" "$1" | cut -d= -f2
 }
@@ -34,6 +36,8 @@ run_test() {
             out_file=`echo "$file" | sed -e 's/.test$/.out/g'`
             if diff "out.tmp" "$out_file" > diff.tmp; then
                 echo " OK"
+                nsucctest=`echo "$nsucctest"`
+                return 0
             else
                 echo " ERROR"
                 echo "    DIFF:"
@@ -42,6 +46,7 @@ run_test() {
             fi
         else
             echo " OK"
+            return 0
         fi
     else
         echo " ERROR"
@@ -50,6 +55,7 @@ run_test() {
         cat err.tmp
         echo ""
     fi
+    return 1
 }
 
 
@@ -63,9 +69,18 @@ echo ""
 ntests=`echo "$test_files" | wc -l`
 echo "Running $ntests tests..."
 
-echo "$test_files" | while read -r file; do
-    run_test "$file"
-done
+while read -r file; do
+    if run_test "$file"; then
+        nsucctest="${nsucctest}a"
+    fi
+done <<EOT
+$(echo -n "$test_files")
+EOT
+
+nsucctest=`printf "$nsucctest" | wc -m`
+
+echo ""
+echo "$nsucctest/$ntests SUCCESSFUL"
 
 rm err.tmp
 rm out.tmp
