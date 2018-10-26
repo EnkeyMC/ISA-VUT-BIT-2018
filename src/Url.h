@@ -56,6 +56,9 @@ public:
      */
     bool is_https() const;
 
+    bool operator== (const Url &url) const;
+    bool operator!= (const Url &url) const;
+
 private:
     string original;
 

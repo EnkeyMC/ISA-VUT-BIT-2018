@@ -11,6 +11,8 @@ string trim(const string &str) {
         return str;
     size_t start = str.find_first_not_of(" \t\r");
     size_t end = str.find_last_not_of(" \t\r") + 1;
+    if (start > end)
+        return "";
     return str.substr(start, end - start);
 }
 

@@ -37,6 +37,7 @@ run_test() {
             if diff "out.tmp" "$out_file" > diff.tmp; then
                 echo " OK"
                 nsucctest=`echo "$nsucctest"`
+                rm diff.tmp
                 return 0
             else
                 echo " ERROR"

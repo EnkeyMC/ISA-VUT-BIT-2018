@@ -31,6 +31,7 @@ void print_help(const string &exe_name);
 vector<Url> parse_feedfile(const string &feedfile);
 void remove_comment(string &str);
 Feed get_feed(SSLWrapper *ssl, const Url &url);
+void print_feed(const Feed &feed, const Params &params);
 
 
 int main(int argc, char** argv) {
@@ -74,14 +75,22 @@ void run_program(int argc, char **argv) {
         urls.push_back(url);
     } else {
         urls = parse_feedfile(params.feedfile);
-    } debug(urls);
+    } //debug(urls);
 
     SSLWrapper::init();
     SSLWrapper ssl{params.certfile, params.certaddr};
     Feed feed;
+    bool first = true;
     for (const Url &url : urls) {
+        if (urls.size() > 1 && !first)
+            cout << endl;
+        first = false;
+
         feed = get_feed(&ssl, url);
-        cout << feed << endl; // TODO error printing
+        if (feed.has_error())
+            cerr << feed.get_error();
+        else
+            print_feed(feed, params);
     }
 }
 
@@ -221,4 +230,22 @@ Feed get_feed(SSLWrapper *ssl, const Url &url) {
     Feed feed{};
     feed.parse(content);
     return feed;
+}
+
+void print_feed(const Feed &feed, const Params &params) {
+    cout << "*** " << feed.get_title() << " ***" << endl;
+
+    auto entries = feed.get_entries();
+    for (const auto &entry : entries) {
+        cout << entry.title << endl;
+        if (params.show_url)
+            cout << "URL: " << entry.url << endl;
+        if (params.show_time)
+            cout << "Aktualizace: " << entry.time << endl;
+        if (params.show_author)
+            cout << "Autor: " << entry.author << endl;
+
+        if (params.show_url || params.show_author || params.show_time)
+            cout << endl;
+    }
 }

@@ -56,7 +56,7 @@ void Http::read_response(SSLWrapper *ssl, HttpResponse &response) {
     }
 
 
-    debug(response);
+    //debug(response);
 }
 
 void Http::parse_header(const string &header, HttpResponse &http_response) {

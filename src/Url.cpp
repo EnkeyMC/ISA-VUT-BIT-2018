@@ -81,6 +81,17 @@ const string &Url::get_original() const {
     return this->original;
 }
 
+bool Url::operator==(const Url &url) const {
+    return url.protocol == this->protocol
+            && url.hostname == this->hostname
+            && url.port == this->port
+            && url.path == this->path;
+}
+
+bool Url::operator!=(const Url &url) const {
+    return !(*this == url);
+}
+
 std::ostream &operator<<(std::ostream &os, const Url &url) {
     os << url.get_original();
     return os;
