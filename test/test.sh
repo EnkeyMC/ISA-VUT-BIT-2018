@@ -26,7 +26,7 @@ run_test() {
 
     check_output=$( get_test_file_key_val "$file" "CHECK_OUTPUT" )
 
-    printf "$file: $name..."
+    printf "$file:  $name..."
 
     eval "$executable" $args 2> err.tmp > out.tmp
     actual_rc=$?

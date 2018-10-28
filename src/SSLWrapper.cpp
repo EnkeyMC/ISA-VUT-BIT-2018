@@ -127,6 +127,9 @@ void SSLWrapper::connect_secure() {
     BIO_set_conn_hostname(this->bio, (this->url.get_hostname() + ":" + this->url.get_port()).c_str());
 
     this->connect_bio();
+
+    if (SSL_get_verify_result(this->ssl))
+        throw SSLException("Nepodařilo se ověřit platnost certifikátu serveru "+this->url.get_hostname());
 }
 
 void SSLWrapper::connect_bio() {
