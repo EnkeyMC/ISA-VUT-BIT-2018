@@ -3,7 +3,7 @@ ZIP=xomach00.zip
 SOURCES=$(wildcard src/*)
 MISC_FILES=Makefile CMakeLists.txt test/test.sh
 LIB_FILES=$(wildcard lib/*)
-TESTS=$(shell find test -type f -regex ".*\(test\|out\)")
+TESTS=$(shell find test -type f -regex ".*\(test\|out\|txt\)")
 
 run: compile
 	./$(EXEC) https://xkcd.com/atom.xml
@@ -14,7 +14,7 @@ compile: $(SOURCES) CMakeLists.txt
 
 compile-force: $(SOURCES) CMakeLists.txt
 	mkdir -p cmake-build-debug
-	cd cmake-build-debug && rm CMakeCache.txt && cmake .. && make && mv $(EXEC) ../
+	cd cmake-build-debug && rm -f CMakeCache.txt && cmake .. && make && mv $(EXEC) ../
 
 clean:
 	rm -f $(EXEC)

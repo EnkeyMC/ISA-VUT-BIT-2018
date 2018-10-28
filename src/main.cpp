@@ -77,6 +77,9 @@ void run_program(int argc, char **argv) {
         urls = parse_feedfile(params.feedfile);
     } //debug(urls);
 
+    if (urls.empty())
+        throw ArgumentException("Soubor " + params.feedfile + " neobsahuje žádné URL");
+
     SSLWrapper::init();
     SSLWrapper ssl{params.certfile, params.certaddr};
     Feed feed;
@@ -236,7 +239,11 @@ void print_feed(const Feed &feed, const Params &params) {
     cout << "*** " << feed.get_title() << " ***" << endl;
 
     auto entries = feed.get_entries();
+    bool first = true;
     for (const auto &entry : entries) {
+        if (!first && (params.show_url || params.show_author || params.show_time))
+            cout << endl;
+        first = false;
         cout << entry.title << endl;
         if (params.show_url)
             cout << "URL: " << entry.url << endl;
@@ -244,8 +251,5 @@ void print_feed(const Feed &feed, const Params &params) {
             cout << "Aktualizace: " << entry.time << endl;
         if (params.show_author)
             cout << "Autor: " << entry.author << endl;
-
-        if (params.show_url || params.show_author || params.show_time)
-            cout << endl;
     }
 }
