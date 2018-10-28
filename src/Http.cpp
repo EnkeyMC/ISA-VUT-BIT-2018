@@ -27,9 +27,9 @@ string Http::get_request(SSLWrapper *ssl, const Url &url) {
     ssl->close();
 
     if (response.status_code < 200 || (response.status_code > 200 && response.status_code < 400))
-        throw UnsupportedHttpStatusException("Unsupported HTTP response code: " + response.status_reason);
+        throw UnsupportedHttpStatusException("Server vrátil nepodporovaný status kód: " + response.status_reason);
     else if (response.status_code >= 400)
-        throw HttpException("Server returned error status code: " + response.status_reason);
+        throw HttpException("Server vrátil chybu: " + response.status_reason);
 
     return std::move(response.content);
 }

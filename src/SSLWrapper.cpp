@@ -1,4 +1,3 @@
-
 #include "SSLWrapper.h"
 
 #include <openssl/bio.h>
@@ -63,7 +62,7 @@ string SSLWrapper::read() {
             buffer[read] = '\0';
             osstream << buffer;
         } else if (read < 0 && !this->should_retry())
-            throw SSLException("Error reading data from " + this->url.get_hostname());
+            throw SSLException("Chyba čtení dat ze serveru " + this->url.get_original());
         else if (this->should_retry()) {
             this->wait();
         }
@@ -113,7 +112,7 @@ void SSLWrapper::setup_ssl() {
 void SSLWrapper::connect_insecure() {
     this->bio = BIO_new_connect((this->url.get_hostname() + ":" + this->url.get_port()).c_str());
     if (this->bio == nullptr)
-        throw SSLException("Could not open connection to " + url.get_hostname() + " (Reason: " + this->get_error_str() + ")");
+        throw SSLException("Nepodařilo se připojit k serveru " + url.get_hostname() + " (Chybová zpráva: " + this->get_error_str() + ")");
 
     this->connect_bio();
 }

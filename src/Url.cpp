@@ -41,19 +41,19 @@ void Url::from_string(const string &url) {
 
 void Url::validate() const {
     if (!std::regex_match(this->original, std::regex(R"(^([\w\d]+:\/\/)?[\w\d\.\-]+(:\d{1,5})?(\/.*)?$)")))
-        throw UrlException("Url " + this->original + " is invalid");
+        throw UrlException("URL " + this->original + " není validní");
 
     if (this->protocol != "http" && this->protocol != "https")
-        throw UrlException("Only HTTP or HTTPS protocol is allowed, " + this->protocol + " used in " + this->original);
+        throw UrlException("Podporované jsou pouze protokoly HTTP a HTTPS, " + this->original + " používá " + this->get_protocol());
 
     try {
         int port;
         port = std::stoi(this->port);
 
         if (port < 0 || port > 65535)
-            throw UrlException("Url port is out of range (" + this->port + ")");
+            throw UrlException("URL port je mimo rozsah (" + this->port + ")");
     } catch (const std::out_of_range &e) {
-        throw UrlException("Url port is out of range (" + this->port + ")");
+        throw UrlException("URL port je mimo rozsah (" + this->port + ")");
     }
 }
 

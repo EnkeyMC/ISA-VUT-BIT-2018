@@ -22,12 +22,10 @@ void Feed::parse(const string &xml) {
         this->error = result.description();
         return;
     }
-    debug(result.status);
-    debug(result.description());
 
     pugi::xml_node feed_node = this->get_feed_node(doc);
     if (!feed_node) {
-        this->error = "Invalid feed format (missing valid root XML tag)";
+        this->error = "Formát zdroje není validní (chybí validní kořenový XML element) ";
         return;
     }
 
@@ -49,11 +47,11 @@ void Feed::parse_feed_title(const pugi::xml_node &feed_node) {
     if ((title_node = feed_node.child("title"))) {}
     else if ((title_node = feed_node.child("channel").child("title"))) {}
     else {
-        this->title = "<< ERROR: TITLE NOT FOUND >>";
+        this->title = "<< BEZ NÁZVU >>";
         return;
     }
 
-    this->title = title_node.text().as_string("<< ERROR READING TITLE >>");
+    this->title = title_node.text().as_string("<< CHYBA ČTENÍ NÁZVU >>");
 }
 
 const string &Feed::get_title() const {
@@ -99,7 +97,7 @@ pugi::xml_object_range<pugi::xml_named_node_iterator> Feed::get_entry_iterator(c
 }
 
 string Feed::get_entry_title(const pugi::xml_node &entry_node) const {
-    return entry_node.child("title").text().as_string();
+    return entry_node.child("title").text().as_string("<< BEZ NÁZVU >>");
 }
 
 string Feed::get_entry_time(const pugi::xml_node &entry_node) const {

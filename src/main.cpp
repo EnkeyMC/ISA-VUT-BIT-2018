@@ -13,6 +13,12 @@
 #include "debug.h"
 
 
+#define EXIT_ARG_ERROR 1
+#define EXIT_CONN_ERROR 2
+#define EXIT_UNSUPORTED_STATUS 3
+#define EXIT_HTTP_ERROR 4
+#define EXIT_INTERN_ERROR 99
+
 using namespace std;
 
 typedef struct {
@@ -38,28 +44,28 @@ int main(int argc, char** argv) {
     try {
         run_program(argc, argv);
     } catch (const ArgumentException &e) {
-        cerr << "Argument error: " << e.what() << endl << endl;
+        cerr << "Chyba: " << e.what() << endl << endl;
         print_help(argv[0]);
-        return 1;
+        return EXIT_ARG_ERROR;
     } catch (const UrlException &e) {
-        cerr << "Argument error: " << e.what() << endl << endl;
+        cerr << "Chyba: " << e.what() << endl << endl;
         print_help(argv[0]);
-        return 1;
+        return EXIT_ARG_ERROR;
     } catch (const SSLException &e) {
-        cerr << e.what() << endl;
-        return 2;
+        cerr << "Chyba: " << e.what() << endl;
+        return EXIT_CONN_ERROR;
     } catch (const UnsupportedHttpStatusException &e) {
-        cerr << e.what() << endl;
-        return 3;
+        cerr << "Chyba: " << e.what() << endl;
+        return EXIT_UNSUPORTED_STATUS;
     } catch (const HttpException &e) {
-        cerr << e.what() << endl;
-        return 4;
+        cerr << "Chyba: " << e.what() << endl;
+        return EXIT_HTTP_ERROR;
     } catch (const exception &e) {
-        cerr << e.what() << endl;
-        return 99;
+        cerr << "Interní chyba: " << e.what() << endl;
+        return EXIT_INTERN_ERROR;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 void run_program(int argc, char **argv) {
@@ -75,7 +81,7 @@ void run_program(int argc, char **argv) {
         urls.push_back(url);
     } else {
         urls = parse_feedfile(params.feedfile);
-    } //debug(urls);
+    }
 
     if (urls.empty())
         throw ArgumentException("Soubor " + params.feedfile + " neobsahuje žádné URL");
@@ -101,7 +107,7 @@ Params get_params(int argc, char** argv) {
     Params params{};
 
     if (argc == 1) {
-        throw ArgumentException("Required arguments missing");
+        throw ArgumentException("Chybí povinné argumenty");
     }
 
     int opt;
@@ -112,57 +118,57 @@ Params get_params(int argc, char** argv) {
             switch (opt) {
                 case 'f':
                     if (!params.feedfile.empty()) {
-                        throw ArgumentException("Option -f can only be present once");
+                        throw ArgumentException("Přepínač -f lze zadat pouze jednou");
                     }
                     params.feedfile = string(optarg);
                     break;
 
                 case 'c':
                     if (!params.certfile.empty()) {
-                        throw ArgumentException("Option -c can only be present once");
+                        throw ArgumentException("Přepínač -c lze zadat pouze jednou");
                     }
                     params.certfile = string(optarg);
                     break;
 
                 case 'C':
                     if (!params.certaddr.empty()) {
-                        throw ArgumentException("Option -C can only be present once");
+                        throw ArgumentException("Přepínač -C lze zadat pouze jednou");
                     }
                     params.certaddr = string(optarg);
                     break;
 
                 case 'T':
                     if (params.show_time) {
-                        throw ArgumentException("Option -t can only be present once");
+                        throw ArgumentException("Přepínač -t lze zadat pouze jednou");
                     }
                     params.show_time = true;
                     break;
 
                 case 'a':
                     if (params.show_author) {
-                        throw ArgumentException("Option -a can only be present once");
+                        throw ArgumentException("Přepínač -a lze zadat pouze jednou");
                     }
                     params.show_author = true;
                     break;
 
                 case 'u':
                     if (params.show_url) {
-                        throw ArgumentException("Option -u can only be present once");
+                        throw ArgumentException("Přepínač -u lze zadat pouze jednou");
                     }
                     params.show_url = true;
                     break;
 
                 case ':':
-                    throw ArgumentException("Missing option argument");
+                    throw ArgumentException("Přepínači "+string(argv[optind-1])+" chybí argument");
 
                 default:
-                    throw ArgumentException("Invalid option");
+                    throw ArgumentException("Neznámý přepínač "+string(argv[optind-1]));
             }
         }
 
         if (optind < argc) {
             if (!params.url.empty()) {
-                throw ArgumentException("You can specify only one URL");
+                throw ArgumentException("Lze specifikovat pouze jedno URL");
             }
             params.url = string(argv[optind]);
             optind++;
@@ -170,25 +176,25 @@ Params get_params(int argc, char** argv) {
     } while (optind < argc);
 
     if (params.url.empty() && params.feedfile.empty()) {
-        throw ArgumentException("You have to specify URL or feedfile (option -f)");
+        throw ArgumentException("Chybí jeden z povinných argumentů");
     } else if (!params.url.empty() && !params.feedfile.empty()) {
-        throw ArgumentException("You cannot specify URL and feedfile (option -f) at the same time");
+        throw ArgumentException("Nelze kombinovat URL argument a přepínač -f");
     }
 
     return params;
 }
 
 void print_help(const string &exe_name) {
-    cerr << "Usage:" << endl;
+    cerr << "Použití:" << endl;
     cerr << " " << exe_name << " <URL | -f <feedfile>> [-c <cerfile>] [-C <certaddr>] [-T] [-a] [-u]" << endl << endl;
-    cerr << "Downloads given RSS or Atom feed and prints information to standard output." << endl << endl;
-    cerr << "Options:" << endl;
-    cerr << " -f <feedfile>   file with multiple URLs to RSS or Atom feed" << endl;
-    cerr << " -c <certfile>   file with certificates used to check SSL/TLS certificate validity" << endl;
-    cerr << " -C <certaddr>   scans given directory for certificates for SSL/TLS certificate validity check" << endl;
-    cerr << " -T              show information about creation or modification time of record (if available)" << endl;
-    cerr << " -a              show author or his e-mail address (if available)" << endl;
-    cerr << " -u              show asociated URL to each record (if available)" << endl;
+    cerr << "Stáhne RSS nebo Atom zdroj a vypíše informace o něm na standardní výstup." << endl << endl;
+    cerr << "Přepínače:" << endl;
+    cerr << " -f <feedfile>   jako zdroje použije URL ze zadaného souboru" << endl;
+    cerr << " -c <certfile>   certfile musí být soubor s certifikáty, které budou použity pro ověření validity certifikátů serverů" << endl;
+    cerr << " -C <certaddr>   použije zadaný adresář pro ověření validity certifikátů při připojování k serverům" << endl;
+    cerr << " -T              zobrazí informaci o času vytvoření nebo upravení záznamu zdroje" << endl;
+    cerr << " -a              zobrazí autora záznamu zdroje" << endl;
+    cerr << " -u              zobrazí URL záznamu zdroje" << endl;
 }
 
 vector<Url> parse_feedfile(const string &feedfile) {
@@ -198,7 +204,7 @@ vector<Url> parse_feedfile(const string &feedfile) {
     vector<Url> urls;
 
     if (!file.is_open())
-        throw ArgumentException("File " + feedfile + " could not be opened");
+        throw ArgumentException("Soubor " + feedfile + " se nepodařilo otevřít");
 
     while (getline(file, line)) {
         remove_comment(line);
@@ -211,7 +217,7 @@ vector<Url> parse_feedfile(const string &feedfile) {
                 url.validate();
                 urls.push_back(url);
             } catch (const UrlException &e) {
-                cerr << "Ignoring URL " << line << ", error occurred: " << e.what() << endl;
+                cerr << line << " není validní URL, přeskočeno (chyba: " << e.what() << ")" << endl;
             }
         }
     }
