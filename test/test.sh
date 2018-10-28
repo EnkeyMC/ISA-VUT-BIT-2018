@@ -10,7 +10,7 @@ executable=$1
 nsucctest=""
 
 get_test_file_key_val() {
-    grep "^$2=" "$1" | cut -d= -f2
+    grep "^$2=" "$1" | cut -d= -f2-
 }
 
 run_test() {

@@ -1,0 +1,4 @@
+NAME=One URL and invalid
+ARGS=-f resources/feedfile_one_invalid.txt
+RC=1
+CHECK_OUTPUT=0

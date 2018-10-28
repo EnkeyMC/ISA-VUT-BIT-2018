@@ -1,4 +1,0 @@
-NAME=Connection to https://tools.ietf.org/agenda/atom
-ARGS=https://tools.ietf.org/agenda/atom
-RC=0
-CHECK_OUTPUT=0

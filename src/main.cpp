@@ -17,6 +17,7 @@
 #define EXIT_CONN_ERROR 2
 #define EXIT_UNSUPORTED_STATUS 3
 #define EXIT_HTTP_ERROR 4
+#define EXIT_APP_ERROR 5
 #define EXIT_INTERN_ERROR 99
 
 using namespace std;
@@ -60,6 +61,9 @@ int main(int argc, char** argv) {
     } catch (const HttpException &e) {
         cerr << "Chyba: " << e.what() << endl;
         return EXIT_HTTP_ERROR;
+    } catch (const ApplicationException &e) {
+        cerr << "Chyba: " << e.what() << endl;
+        return EXIT_APP_ERROR;
     } catch (const exception &e) {
         cerr << "Interní chyba: " << e.what() << endl;
         return EXIT_INTERN_ERROR;
@@ -90,17 +94,27 @@ void run_program(int argc, char **argv) {
     SSLWrapper ssl{params.certfile, params.certaddr};
     Feed feed;
     bool first = true;
+    int errors = 0;
     for (const Url &url : urls) {
-        if (urls.size() > 1 && !first)
-            cout << endl;
-        first = false;
 
-        feed = get_feed(&ssl, url);
-        if (feed.has_error())
-            cerr << feed.get_error();
-        else
+        try {
+            feed = get_feed(&ssl, url);
+            
+            if (urls.size() > 1 && !first)
+                cout << endl;
+            first = false;
+            
             print_feed(feed, params);
+        } catch (const ApplicationException &e) {
+            if (urls.size() == 1)
+                throw;
+            cerr << "Chyba zdroje ("+url.get_original()+"): "+e.what()+" (přeskakuji)" << endl;
+            errors++;
+        }            
     }
+    
+    if (errors == urls.size())
+        throw ApplicationException("Žádné zdroje se nepodařilo načíst");
 }
 
 Params get_params(int argc, char** argv) {

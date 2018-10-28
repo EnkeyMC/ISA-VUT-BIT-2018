@@ -1,0 +1,4 @@
+NAME=All URLs invalid in feedfile
+ARGS=-f resources/feedfile_all_invalid.txt
+RC=1
+CHECK_OUTPUT=0

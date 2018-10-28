@@ -1,0 +1,4 @@
+NAME=Some URLs invalid
+ARGS=-f resources/feedfile_some_invalid.txt
+RC=0
+CHECK_OUTPUT=1

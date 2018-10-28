@@ -140,7 +140,10 @@ void SSLWrapper::connect_bio() {
             connected = true;
         if (this->should_retry())
             this->wait(false);
-    } while (!connected);
+    } while (!connected && this->should_retry());
+    
+    if (!connected)
+        throw SSLException("Nepodařilo se připojit k serveru "+this->url.get_hostname());
 }
 
 string SSLWrapper::get_error_str() {

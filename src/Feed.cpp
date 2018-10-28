@@ -1,6 +1,7 @@
 #include "Feed.h"
 #include "debug.h"
 #include "utils.h"
+#include "exceptions.h"
 
 std::ostream &operator<<(std::ostream &os, const Feed &feed) {
     os << "*** " << feed.get_title() << " ***" << std::endl;
@@ -19,14 +20,12 @@ void Feed::parse(const string &xml) {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_buffer(xml.c_str(), xml.length());
     if (!result) {
-        this->error = result.description();
-        return;
+        throw ApplicationException("Zdroj není validní XML (chyba: "+string(result.description())+")");
     }
 
     pugi::xml_node feed_node = this->get_feed_node(doc);
     if (!feed_node) {
-        this->error = "Formát zdroje není validní (chybí validní kořenový XML element) ";
-        return;
+        throw ApplicationException("Formát zdroje není validní (chybí validní kořenový XML element)");
     }
 
     this->parse_feed_title(feed_node);
@@ -60,14 +59,6 @@ const string &Feed::get_title() const {
 
 const vector<FeedEntry> Feed::get_entries() const {
     return this->entries;
-}
-
-bool Feed::has_error() const {
-    return !this->error.empty();
-}
-
-string Feed::get_error() const {
-    return this->error;
 }
 
 void Feed::parse_entries(const pugi::xml_node &feed_node) {

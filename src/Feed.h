@@ -19,8 +19,6 @@ typedef struct stFeedEntry {
 class Feed {
 public:
     void parse(const string &xml);
-    bool has_error() const;
-    string get_error() const;
 
     const string& get_title() const;
     const vector<FeedEntry> get_entries() const;
@@ -37,8 +35,6 @@ private:
 
     string title;
     vector<FeedEntry> entries;
-
-    string error;
 };
 
 std::ostream& operator<<(std::ostream &os, const Feed &feed);
