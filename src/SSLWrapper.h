@@ -42,12 +42,11 @@ public:
 
     /**
      * Read message from host
-     * @param length max message length
      * @return message
      *
      * @throws SSLException on error
      */
-    string read(int length);
+    string read();
     /**
      * Write message to host
      * @param msg message
@@ -67,6 +66,8 @@ public:
      */
     bool should_retry() const;
 
+    void wait(bool read = true) const;
+
 private:
     BIO * bio;
     SSL_CTX * ssl_ctx;
@@ -77,6 +78,7 @@ private:
 
     void connect_insecure();
     void connect_secure();
+    void connect_bio();
 
     string get_error_str();
 };

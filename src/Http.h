@@ -34,7 +34,7 @@ public:
 private:
     static void read_response(SSLWrapper* ssl, HttpResponse &response);
     static void parse_header(const string &header, HttpResponse &http_response);
-    static string read_chunked_content(SSLWrapper *ssl, const string &content_start);
+    static string read_chunked_content(const string &content_start);
     static string create_get_request(const Url &url);
 };
 

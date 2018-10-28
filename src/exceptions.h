@@ -20,6 +20,11 @@ public:
     explicit SSLException(const std::string &__arg);
 };
 
+class SSLTimeoutException : public SSLException {
+public:
+    explicit SSLTimeoutException(const std::string &__arg);
+};
+
 class UrlException : public ApplicationException {
 public:
     explicit UrlException(const std::string &__arg);

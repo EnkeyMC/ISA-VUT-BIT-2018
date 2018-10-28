@@ -11,3 +11,5 @@ UrlException::UrlException(const std::string &__arg) : ApplicationException(__ar
 HttpException::HttpException(const std::string &__arg) : ApplicationException(__arg) {}
 
 UnsupportedHttpStatusException::UnsupportedHttpStatusException(const std::string &__arg) : HttpException(__arg) {}
+
+SSLTimeoutException::SSLTimeoutException(const std::string &__arg) : SSLException(__arg) {}

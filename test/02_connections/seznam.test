@@ -1,4 +1,4 @@
-NAME=Connection to http://www.novinky.cz/rss2/vase-zpravy/
-ARGS=http://www.novinky.cz/rss2/vase-zpravy/
+NAME=Connection to https://www.novinky.cz/rss2/vase-zpravy/
+ARGS=https://www.novinky.cz/rss2/vase-zpravy/
 RC=0
 CHECK_OUTPUT=0

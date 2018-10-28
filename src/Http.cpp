@@ -8,9 +8,9 @@
 #include "utils.h"
 #include "exceptions.h"
 
-#define READ_BUFF_LEN 1024
 #define CRLF "\r\n"
 #define CRLF_LEN 2
+#define LF '\n'
 
 using std::istringstream;
 using std::getline;
@@ -38,25 +38,21 @@ void Http::read_response(SSLWrapper *ssl, HttpResponse &response) {
     string response_str{};
     size_t header_end;
 
-    do {
-        response_str += ssl->read(READ_BUFF_LEN);
-        header_end = response_str.find(CRLF CRLF);
-    } while (header_end == string::npos);
+    response_str = ssl->read();
+
+    header_end = response_str.find(CRLF CRLF);
+//    if (header_end == string::npos)
+//        header_end = response_str.find(LF);
+    if (header_end == string::npos)
+        throw HttpException("Odpověď serveru není validní HTTP");
 
     parse_header(response_str.substr(0, header_end), response);
 
     if (response.transfer_coding == "chunked") {
-        response.content = read_chunked_content(ssl, response_str.substr(header_end + 4));
-    } else if (response.content_len > 0) {
-        while (ssl->should_retry() || response_str.length() - header_end - 4 < response.content_len) {
-            response_str += ssl->read(READ_BUFF_LEN);
-        }
-
-        response.content = response_str.substr(header_end + 4);
+        response.content = read_chunked_content(response_str.substr(header_end + CRLF_LEN*2));
+    } else {
+        response.content = response_str.substr(header_end + CRLF_LEN*2);
     }
-
-
-    //debug(response);
 }
 
 void Http::parse_header(const string &header, HttpResponse &http_response) {
@@ -77,21 +73,14 @@ void Http::parse_header(const string &header, HttpResponse &http_response) {
     }
 }
 
-string Http::read_chunked_content(SSLWrapper *ssl, const string &content_start) {
+string Http::read_chunked_content(const string &content_start) {
     std::ostringstream content{};
     string buffer = content_start;
     size_t chunk_size;
 
     do {
-        if (buffer.find(CRLF) == string::npos)  // If we don't have the whole chunk-size in buffer, read more
-            buffer += ssl->read(READ_BUFF_LEN);
-
         chunk_size = std::stoul(buffer.substr(0, buffer.find_first_of(" \t" CRLF)), nullptr, 16);
         buffer.erase(0, buffer.find(CRLF) + CRLF_LEN);
-
-        while (buffer.length() < chunk_size + CRLF_LEN) {
-            buffer += ssl->read(READ_BUFF_LEN);
-        }
 
         content << buffer.substr(0, chunk_size);
         buffer.erase(0, chunk_size + CRLF_LEN);
