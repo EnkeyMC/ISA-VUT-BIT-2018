@@ -36,22 +36,25 @@ string Http::get_request(SSLWrapper *ssl, const Url &url) {
 
 void Http::read_response(SSLWrapper *ssl, HttpResponse &response) {
     string response_str{};
-    size_t header_end;
+    LineFeedPos header_end;
 
     response_str = ssl->read();
 
-    header_end = response_str.find(CRLF CRLF);
-//    if (header_end == string::npos)
-//        header_end = response_str.find(LF);
-    if (header_end == string::npos)
-        throw HttpException("Odpověď serveru není validní HTTP");
+    header_end = find_line_feeds(response_str, 2);
+    
+    if (header_end.offset == string::npos)
+        throw HttpException("Odpověď serveru není validní HTTP odpověď");
 
-    parse_header(response_str.substr(0, header_end), response);
+    parse_header(response_str.substr(0, header_end.offset), response);
+    if (response.status_reason.empty())
+        throw HttpException("Odpověď serveru není validní HTTP odpověď");
+    if (response.status_code != 200)
+        return;
 
     if (response.transfer_coding == "chunked") {
-        response.content = read_chunked_content(response_str.substr(header_end + CRLF_LEN*2));
+        response.content = read_chunked_content(response_str.substr(header_end.offset + header_end.length));
     } else {
-        response.content = response_str.substr(header_end + CRLF_LEN*2);
+        response.content = response_str.substr(header_end.offset + header_end.length);
     }
 }
 
@@ -77,13 +80,16 @@ string Http::read_chunked_content(const string &content_start) {
     std::ostringstream content{};
     string buffer = content_start;
     size_t chunk_size;
+    LineFeedPos lf_pos;
 
     do {
         chunk_size = std::stoul(buffer.substr(0, buffer.find_first_of(" \t" CRLF)), nullptr, 16);
-        buffer.erase(0, buffer.find(CRLF) + CRLF_LEN);
+        lf_pos = find_line_feeds(buffer);
+        buffer.erase(0, lf_pos.offset + lf_pos.length);
 
         content << buffer.substr(0, chunk_size);
-        buffer.erase(0, chunk_size + CRLF_LEN);
+        lf_pos = find_line_feeds(buffer, 1, chunk_size);
+        buffer.erase(0, chunk_size + lf_pos.length);
     } while (chunk_size != 0);
 
     return content.str();
@@ -101,6 +107,29 @@ string Http::create_get_request(const Url &url) {
     ostream << CRLF;
 
     return ostream.str();
+}
+
+Http::LineFeedPos Http::find_line_feeds(const string &str, int n, size_t pos) {
+    string lfs {};
+    for (int i = 0; i < n; i++)
+        lfs += CRLF;
+    
+    size_t position = str.find(lfs, pos);
+    LineFeedPos result{};
+    if (position != string::npos) {
+        result.offset = position;
+        result.length = CRLF_LEN*n;
+        return result;
+    }
+    
+    lfs = "";
+    for (int i = 0; i < n; i++)
+        lfs += LF;
+    
+    position = str.find(lfs, pos);
+    result.offset = position;
+    result.length = n;
+    return result;
 }
 
 std::ostream &operator<<(std::ostream &os, const HttpResponse &response) {

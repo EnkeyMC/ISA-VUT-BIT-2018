@@ -32,10 +32,16 @@ public:
     static string get_request(SSLWrapper* ssl, const Url &url);
 
 private:
+    typedef struct {
+        size_t offset;
+        int length;
+    } LineFeedPos;
+    
     static void read_response(SSLWrapper* ssl, HttpResponse &response);
     static void parse_header(const string &header, HttpResponse &http_response);
     static string read_chunked_content(const string &content_start);
     static string create_get_request(const Url &url);
+    static LineFeedPos find_line_feeds(const string &str, int n = 1, size_t pos = 0);
 };
 
 
