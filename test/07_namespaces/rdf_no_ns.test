@@ -1,0 +1,4 @@
+NAME=RDF without specified namespace
+ARGS=http://www.mocky.io/v2/5beefa592e00006435eeeb5c
+RC=0
+CHECK_OUTPUT=1

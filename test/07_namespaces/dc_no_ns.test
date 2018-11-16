@@ -1,0 +1,4 @@
+NAME=Dublin Core without specified namespace
+ARGS=http://www.mocky.io/v2/5beef7fa2e00004c38eeeb53 -a -T -u
+RC=0
+CHECK_OUTPUT=1

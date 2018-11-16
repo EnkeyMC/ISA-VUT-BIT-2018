@@ -16,29 +16,34 @@ std::ostream &operator<<(std::ostream &os, const Feed &feed) {
     return os;
 }
 
+Feed::Feed(const string &source_url) : source(source_url) {
+
+}
+
 void Feed::parse(const string &xml) {
     pugi::xml_document doc;
     pugi::xml_parse_result result = doc.load_buffer(xml.c_str(), xml.length());
     if (!result) {
-        throw ApplicationException("Zdroj není validní XML (chyba: "+string(result.description())+")");
+        throw ApplicationException(this->source+": Zdroj nevrátil validní XML (chyba: "+string(result.description())+")");
     }
 
-    pugi::xml_node feed_node = this->get_feed_node(doc);
-    if (!feed_node) {
-        throw ApplicationException("Formát zdroje není validní (chybí validní kořenový XML element)");
+    pugi::xml_node feed_node = doc.first_child();
+    this->parse_namespaces(feed_node);
+
+    if (!this->is_valid_feed_node(feed_node)) {
+        throw ApplicationException(this->source+": Formát zdroje není validní (chybí validní kořenový XML element)");
     }
 
     this->parse_feed_title(feed_node);
     this->parse_entries(feed_node);
 }
 
-pugi::xml_node Feed::get_feed_node(const pugi::xml_document &doc) const {
-    pugi::xml_node feed_node;
-    if ((feed_node = doc.child("feed"))) {}
-    else if ((feed_node = doc.child("rss"))) {}
-    else if ((feed_node = doc.child("RDF"))) {}
-    else if ((feed_node = doc.child("rdf:RDF"))) {}
-    return feed_node;
+bool Feed::is_valid_feed_node(pugi::xml_node &root_node) const {
+    string name = root_node.name();
+    return name == "feed" ||
+           name == "rss" ||
+           name == this->rdf("RDF") ||
+           name == "rdf:RDF";
 }
 
 void Feed::parse_feed_title(const pugi::xml_node &feed_node) {
@@ -93,7 +98,8 @@ string Feed::get_entry_title(const pugi::xml_node &entry_node) const {
 
 string Feed::get_entry_time(const pugi::xml_node &entry_node) const {
     pugi::xml_node time_node;
-    if ((time_node = entry_node.child("dc:date"))) {}
+    if ((time_node = entry_node.child(this->dc("date").c_str()))) {}
+    else if ((time_node = entry_node.child("dc:date"))) {}
     else if ((time_node = entry_node.child("pubDate"))) {}
     else if ((time_node = entry_node.child("updated"))) {}
     return time_node.text().as_string();
@@ -108,11 +114,49 @@ string Feed::get_entry_url(const pugi::xml_node &entry_node) const {
 
 string Feed::get_entry_author(const pugi::xml_node &entry_node) const {
     pugi::xml_node author_node;
-    if ((author_node = entry_node.child("dc:creator"))) {}
-    else if ((author_node = entry_node.child("author").child("name"))) {}  // TODO print name AND email?
+    if ((author_node = entry_node.child(this->dc("creator").c_str()))) {}
+    else if ((author_node = entry_node.child("author").child("name"))) {
+        if (entry_node.child("author").child("email"))  // Print it with email if there is one
+            return string(author_node.text().as_string())
+                   + " ("+entry_node.child("author").child("email").text().as_string()+")";
+    }
     else if ((author_node = entry_node.child("author").child("email"))) {}
     else if ((author_node = entry_node.child("author"))) {}
-    else if ((author_node = entry_node.child("creator"))) {}
+    else if ((author_node = entry_node.child("dc:creator"))) {}
 
     return author_node.text().as_string();
+}
+
+void Feed::parse_namespaces(const pugi::xml_node &feed_node) {
+    string attr_val;
+    for (const auto &attr : feed_node.attributes()) {
+        if (str_starts_with(attr.name(), "xmlns")) {
+            attr_val = attr.as_string();
+            if (attr_val == "http://purl.org/dc/elements/1.1/") {
+                this->ns_dc = this->get_ns_prefix(attr.name());
+            } else if (attr_val == "http://www.w3.org/1999/02/22-rdf-syntax-ns#") {
+                this->ns_rdf = this->get_ns_prefix(attr.name());
+            }
+        }
+    }
+}
+
+string Feed::get_ns_prefix(const string &attr_name) const {
+    auto offset = attr_name.find(':');
+    if (offset == string::npos)
+        return "";
+
+    return attr_name.substr(offset+1);
+}
+
+string Feed::dc(const string &str) const {
+    if (this->ns_dc.empty())
+        return str;
+    return this->ns_dc + ':' + str;
+}
+
+string Feed::rdf(const string &str) const {
+    if (this->ns_rdf.empty())
+        return str;
+    return this->ns_rdf + ':' + str;
 }

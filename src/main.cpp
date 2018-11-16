@@ -250,7 +250,7 @@ void remove_comment(string &str) {
 
 Feed get_feed(SSLWrapper *ssl, const Url &url) {
     string content = Http::get_request(ssl, url);
-    Feed feed{};
+    Feed feed{url.get_original()};
     feed.parse(content);
     return feed;
 }
