@@ -32,15 +32,61 @@ typedef struct {
     bool show_url{};
 } Params;
 
+/**
+ * Run program, throwing exception on error
+ * @param argc argument count
+ * @param argv argument values
+ */
 void run_program(int argc, char** argv);
+
+/**
+ * Get program parameters from program arguments
+ * @param argc argument count
+ * @param argv argument values
+ * @return parameters
+ */
 Params get_params(int argc, char** argv);
+
+/**
+ * Print program help
+ * @param exe_name executable name (argv[0])
+ */
 void print_help(const string &exe_name);
+
+/**
+ * Parse file with RSS or Atom feeds separated by newlines
+ * @param feedfile path to feedfile
+ * @return vector of URLs parsed from the file
+ */
 vector<Url> parse_feedfile(const string &feedfile);
+
+/**
+ * Remove comment from string if there is any (separated by #)
+ * @param str feedfile line
+ */
 void remove_comment(string &str);
+
+/**
+ * Get feed from url
+ * @param ssl SSLWrapper instance to use
+ * @param url URL of the feed
+ * @return parsed feed
+ */
 Feed get_feed(SSLWrapper *ssl, const Url &url);
+
+/**
+ * Print Feed to stdout
+ * @param feed Feed to print
+ * @param params program parameters
+ */
 void print_feed(const Feed &feed, const Params &params);
 
-
+/**
+ * Program entry point
+ * @param argc argument count
+ * @param argv argument values
+ * @return exit code
+ */
 int main(int argc, char** argv) {
     try {
         run_program(argc, argv);

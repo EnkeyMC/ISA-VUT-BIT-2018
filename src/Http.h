@@ -25,7 +25,7 @@ class Http {
 public:
     /**
      * HTTP GET request
-     * @param ssl ssl bio socket pointer connected to host
+     * @param ssl SSLWrapper instance to use
      * @param url url to request
      * @return response data
      */
@@ -36,11 +36,42 @@ private:
         size_t offset;
         int length;
     } LineFeedPos;
-    
+
+    /**
+     * Read HTTP response into response parameter
+     * @param ssl SSLWrapper instance to use
+     * @param response response output parameter
+     */
     static void read_response(SSLWrapper* ssl, HttpResponse &response);
+
+    /**
+     * Parse HTTP header from string into http_response
+     * @param header string with HTTP header
+     * @param http_response parsed header output parameter
+     */
     static void parse_header(const string &header, HttpResponse &http_response);
-    static string read_chunked_content(const string &content_start);
+
+    /**
+     * Read HTTP content in chunked encoding
+     * @param chunked_content content in chunked encoding
+     * @return parsed content
+     */
+    static string read_chunked_content(const string &chunked_content);
+
+    /**
+     * Create HTTP GET request string for given URL
+     * @param url URL of the request
+     * @return request string
+     */
     static string create_get_request(const Url &url);
+
+    /**
+     * Find first sequence of line feeds in string, searches for LF and CRLF
+     * @param str searched string
+     * @param n length of line feed sequence to find
+     * @param pos position to search from
+     * @return position and length of line feed sequence in LineFeedPos structure
+     */
     static LineFeedPos find_line_feeds(const string &str, int n = 1, size_t pos = 0);
 };
 

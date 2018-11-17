@@ -106,7 +106,16 @@ string Feed::get_entry_time(const pugi::xml_node &entry_node) const {
 }
 
 string Feed::get_entry_url(const pugi::xml_node &entry_node) const {
-    pugi::xml_node url_node = entry_node.child("link");
+    pugi::xml_node url_node = entry_node.child("guid");
+
+    if ((url_node && !url_node.attribute("isPermaLink")) ||
+            (url_node.attribute("isPermaLink")
+             && url_node.attribute("isPermaLink").as_bool(true)))
+    {
+        return url_node.text().as_string();
+    }
+
+    url_node = entry_node.child("link");
     if (url_node.text())
         return url_node.text().as_string();
     return url_node.attribute("href").as_string();
@@ -127,9 +136,9 @@ string Feed::get_entry_author(const pugi::xml_node &entry_node) const {
     return author_node.text().as_string();
 }
 
-void Feed::parse_namespaces(const pugi::xml_node &feed_node) {
+void Feed::parse_namespaces(const pugi::xml_node &root_node) {
     string attr_val;
-    for (const auto &attr : feed_node.attributes()) {
+    for (const auto &attr : root_node.attributes()) {
         if (str_starts_with(attr.name(), "xmlns")) {
             attr_val = attr.as_string();
             if (attr_val == "http://purl.org/dc/elements/1.1/") {

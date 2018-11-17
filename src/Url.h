@@ -3,6 +3,7 @@
 #define ISA_URL_H
 
 #include <string>
+#include <ostream>
 
 using std::string;
 

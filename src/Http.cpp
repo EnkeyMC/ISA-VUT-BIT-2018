@@ -36,7 +36,7 @@ string Http::get_request(SSLWrapper *ssl, const Url &url) {
 
 void Http::read_response(SSLWrapper *ssl, HttpResponse &response) {
     string response_str{};
-    LineFeedPos header_end;
+    LineFeedPos header_end{};
 
     response_str = ssl->read();
 
@@ -76,11 +76,11 @@ void Http::parse_header(const string &header, HttpResponse &http_response) {
     }
 }
 
-string Http::read_chunked_content(const string &content_start) {
+string Http::read_chunked_content(const string &chunked_content) {
     std::ostringstream content{};
-    string buffer = content_start;
+    string buffer = chunked_content;
     size_t chunk_size;
-    LineFeedPos lf_pos;
+    LineFeedPos lf_pos{};
 
     do {
         chunk_size = std::stoul(buffer.substr(0, buffer.find_first_of(" \t" CRLF)), nullptr, 16);

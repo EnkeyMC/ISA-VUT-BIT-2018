@@ -66,21 +66,41 @@ public:
      */
     bool should_retry() const;
 
+private:
+
+    /**
+     * Wait for available data in BIO
+     * @param read true = wait for read, false = wait for write
+     */
     void wait(bool read = true) const;
 
-private:
+    /**
+     * Connect wihtout SSL/TLS
+     */
+    void connect_insecure();
+
+    /**
+     * Connect with SSL/TLS
+     */
+    void connect_secure();
+
+    /**
+     * Connect BIO socket
+     */
+    void connect_bio();
+
+    /**
+     * Get error string after OpenSSL returned error
+     * @return error reason string
+     */
+    string get_error_str();
+
     BIO * bio;
     SSL_CTX * ssl_ctx;
     SSL * ssl;
     Url url;
     const string ca;
     const string cadir;
-
-    void connect_insecure();
-    void connect_secure();
-    void connect_bio();
-
-    string get_error_str();
 };
 
 

@@ -19,7 +19,6 @@ void SSLWrapper::init() {
     SSL_load_error_strings();
     SSL_library_init();
     ERR_load_BIO_strings();
-//    OpenSSL_add_all_algorithms();
 }
 
 SSLWrapper::SSLWrapper(const string &ca, const string &cadir) : ca(ca), cadir(cadir) {
@@ -104,7 +103,7 @@ void SSLWrapper::setup_ssl() {
         cadir_p = cadir.empty() ? nullptr : cadir.c_str();
 
         if (!SSL_CTX_load_verify_locations(this->ssl_ctx, cafile_p, cadir_p)) {
-            throw SSLException(this->get_error_str());
+            throw SSLException("Nepodařilo se načíst certifikát nebo složku s certifikáty");
         }
     }
 }

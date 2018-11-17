@@ -1,7 +1,8 @@
 EXEC=feedreader
 ZIP=xomach00.zip
+TAR=xomach00.tar
 SOURCES=$(wildcard src/*)
-MISC_FILES=Makefile CMakeLists.txt test/test.sh
+MISC_FILES=Makefile CMakeLists.txt test/test.sh README
 LIB_FILES=$(wildcard lib/*)
 TESTS=$(shell find test -type f -regex ".*\(test\|out\|txt\)")
 
@@ -18,10 +19,14 @@ compile-force: $(SOURCES) CMakeLists.txt
 
 clean:
 	rm -f $(EXEC)
+	rm -f $(TAR)
 	rm -f $(ZIP)
 
-pack:
+pack-zip:
 	zip $(ZIP) $(SOURCES) $(MISC_FILES) $(TESTS) $(LIB_FILES)
+
+pack:
+	tar -cvf $(TAR) $(SOURCES) $(MISC_FILES) $(TESTS) $(LIB_FILES)
 
 test: compile
 	cd test && ./test.sh ../$(EXEC)
@@ -30,8 +35,8 @@ test-r: compile-force
 	cd test && ./test.sh ../$(EXEC)
 
 test-remote: pack
-	scp $(ZIP) xomach00@merlin.fit.vutbr.cz:~/isa/
-	ssh xomach00@merlin.fit.vutbr.cz 'cd isa/tmp && unzip -o ../$(ZIP) && make test-r'
+	scp $(TAR) xomach00@merlin.fit.vutbr.cz:~/isa/
+	ssh xomach00@merlin.fit.vutbr.cz 'cd isa/tmp && tar -xvf ../$(TAR) && make test-r'
 	ssh xomach00@eva.fit.vutbr.cz 'cd isa/tmp &&  make test-r'
 
 .PHONY: test pack clean
