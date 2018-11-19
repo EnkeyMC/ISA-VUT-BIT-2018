@@ -112,18 +112,33 @@ private:
     string get_entry_author(const pugi::xml_node &entry_node) const;
 
     /**
-     * Prefix string with Dublin Core XML namespace if specified
+     * Parses author names from iterator of <author> XML nodes.
+     * Skips authors without specified name.
+     * @param it XML node iterator
+     * @return string of names (ex. "John Doe, Jane Poe")
+     */
+    string get_atom_entry_authors(const pugi::xml_object_range<pugi::xml_named_node_iterator> &it) const;
+
+    /**
+     * Prefix string with Dublin Core XML namespace if defined
      * @param str string to prefix
      * @return prefixed string
      */
     string dc(const string &str) const;
 
     /**
-     * Prefix string with RDF XML namespace if specified
+     * Prefix string with RDF XML namespace if defined
      * @param str string to prefix
      * @return prefixed string
      */
     string rdf(const string &str) const;
+
+    /**
+     * Prefix string with Atom XML namespace if defined
+     * @param str string to prefix
+     * @return prefixed string
+     */
+    string atom(const string &str) const;
 
     /**
      * Feed title
@@ -146,9 +161,26 @@ private:
     string ns_dc;
 
     /**
+     * Atom namespace prefix
+     */
+    string ns_atom;
+
+    /**
      * Feed source
      */
     string source;
+
+    /**
+     * Whether feed is atom or not
+     */
+    bool is_atom;
+
+    /**
+     * Atom entry tag name prefixed with atom namespace.
+     *
+     * We need to keep it in memory to return iterator from method.
+     */
+    string prefixed_atom_entry;
 };
 
 std::ostream& operator<<(std::ostream &os, const Feed &feed);

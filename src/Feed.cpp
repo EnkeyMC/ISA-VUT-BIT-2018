@@ -17,7 +17,7 @@ std::ostream &operator<<(std::ostream &os, const Feed &feed) {
 }
 
 Feed::Feed(const string &source_url) : source(source_url) {
-
+    this->is_atom = false;
 }
 
 void Feed::parse(const string &xml) {
@@ -31,8 +31,11 @@ void Feed::parse(const string &xml) {
     this->parse_namespaces(feed_node);
 
     if (!this->is_valid_feed_node(feed_node)) {
-        throw ApplicationException(this->source+": Formát zdroje není validní (chybí validní kořenový XML element)");
+        throw ApplicationException(this->source+": Formát zdroje není validní (kořenový XML element není validní)");
     }
+
+    if (feed_node.name() == this->atom("feed"))
+        this->is_atom = true;
 
     this->parse_feed_title(feed_node);
     this->parse_entries(feed_node);
@@ -40,7 +43,7 @@ void Feed::parse(const string &xml) {
 
 bool Feed::is_valid_feed_node(pugi::xml_node &root_node) const {
     string name = root_node.name();
-    return name == "feed" ||
+    return name == this->atom("feed") ||
            name == "rss" ||
            name == this->rdf("RDF") ||
            name == "rdf:RDF";
@@ -48,7 +51,7 @@ bool Feed::is_valid_feed_node(pugi::xml_node &root_node) const {
 
 void Feed::parse_feed_title(const pugi::xml_node &feed_node) {
     pugi::xml_node title_node;
-    if ((title_node = feed_node.child("title"))) {}
+    if ((title_node = feed_node.child(this->atom("title").c_str()))) {}
     else if ((title_node = feed_node.child("channel").child("title"))) {}
     else {
         this->title = "<< BEZ NÁZVU >>";
@@ -67,6 +70,8 @@ const vector<FeedEntry> Feed::get_entries() const {
 }
 
 void Feed::parse_entries(const pugi::xml_node &feed_node) {
+    this->prefixed_atom_entry = this->atom("entry");
+
     auto it = this->get_entry_iterator(feed_node);
     if (it.begin() == it.end())
         return;
@@ -86,13 +91,15 @@ void Feed::parse_entries(const pugi::xml_node &feed_node) {
 pugi::xml_object_range<pugi::xml_named_node_iterator> Feed::get_entry_iterator(const pugi::xml_node &feed_node) const {
     auto it = feed_node.children("item");
     if (it.begin() != it.end()) return it;
-    it = feed_node.children("entry");
+    it = feed_node.children(this->prefixed_atom_entry.c_str());
     if (it.begin() != it.end()) return it;
     it = feed_node.child("channel").children("item");
     return it;
 }
 
 string Feed::get_entry_title(const pugi::xml_node &entry_node) const {
+    if (entry_node.child(this->atom("title").c_str()))
+        return entry_node.child(this->atom("title").c_str()).text().as_string("<< BEZ NÁZVU >>");
     return entry_node.child("title").text().as_string("<< BEZ NÁZVU >>");
 }
 
@@ -101,7 +108,7 @@ string Feed::get_entry_time(const pugi::xml_node &entry_node) const {
     if ((time_node = entry_node.child(this->dc("date").c_str()))) {}
     else if ((time_node = entry_node.child("dc:date"))) {}
     else if ((time_node = entry_node.child("pubDate"))) {}
-    else if ((time_node = entry_node.child("updated"))) {}
+    else if ((time_node = entry_node.child(this->atom("updated").c_str()))) {}
     return time_node.text().as_string();
 }
 
@@ -115,36 +122,73 @@ string Feed::get_entry_url(const pugi::xml_node &entry_node) const {
         return url_node.text().as_string();
     }
 
+    // If feed is in atom format or has link from atom namespace, find alternate link and return href
+    const string &atom_link = this->atom("link");
+    if (this->is_atom || (!this->ns_atom.empty() && entry_node.child(atom_link.c_str()))) {
+        for (const auto link_node : entry_node.children(atom_link.c_str())) {
+            if (string(link_node.attribute("rel").as_string("alternate")) == "alternate") {
+                return link_node.attribute("href").as_string();
+            }
+        }
+    }
+
     url_node = entry_node.child("link");
-    if (url_node.text())
-        return url_node.text().as_string();
-    return url_node.attribute("href").as_string();
+    return url_node.text().as_string();
 }
 
 string Feed::get_entry_author(const pugi::xml_node &entry_node) const {
     pugi::xml_node author_node;
-    if ((author_node = entry_node.child(this->dc("creator").c_str()))) {}
-    else if ((author_node = entry_node.child("author").child("name"))) {
-        if (entry_node.child("author").child("email"))  // Print it with email if there is one
-            return string(author_node.text().as_string())
-                   + " ("+entry_node.child("author").child("email").text().as_string()+")";
+
+    const string &atom_author = this->atom("author");
+    if (this->is_atom || (!this->ns_atom.empty() && entry_node.child(atom_author.c_str()))) {
+        auto it = entry_node.children(atom_author.c_str());
+        if (it.begin() != it.end()) {
+            return this->get_atom_entry_authors(it);
+        }
+
+        it = entry_node.child(this->atom("source").c_str()).children(atom_author.c_str());
+        if (it.begin() != it.end()) {
+            return this->get_atom_entry_authors(it);
+        }
+
+        it = entry_node.parent().children(atom_author.c_str());
+        if (it.begin() != it.end()) {
+            return this->get_atom_entry_authors(it);
+        }
     }
-    else if ((author_node = entry_node.child("author").child("email"))) {}
+
+    if ((author_node = entry_node.child(this->dc("creator").c_str()))) {}
     else if ((author_node = entry_node.child("author"))) {}
     else if ((author_node = entry_node.child("dc:creator"))) {}
 
     return author_node.text().as_string();
 }
 
+string Feed::get_atom_entry_authors(const pugi::xml_object_range<pugi::xml_named_node_iterator> &it) const {
+    string authors{};
+    string splitter{};
+    for (const auto atom_author_node : it) {
+        if (atom_author_node.child("name").text()) {
+            authors += splitter;
+            authors += atom_author_node.child("name").text().as_string();
+            splitter = "; ";
+        }
+    }
+
+    return authors;
+}
+
 void Feed::parse_namespaces(const pugi::xml_node &root_node) {
     string attr_val;
     for (const auto &attr : root_node.attributes()) {
-        if (str_starts_with(attr.name(), "xmlns")) {
+        if (str_starts_with(attr.name(), "xmlns:")) {
             attr_val = attr.as_string();
             if (attr_val == "http://purl.org/dc/elements/1.1/") {
                 this->ns_dc = this->get_ns_prefix(attr.name());
             } else if (attr_val == "http://www.w3.org/1999/02/22-rdf-syntax-ns#") {
                 this->ns_rdf = this->get_ns_prefix(attr.name());
+            } else if (attr_val == "http://www.w3.org/2005/Atom") {
+                this->ns_atom = this->get_ns_prefix(attr.name());
             }
         }
     }
@@ -168,4 +212,10 @@ string Feed::rdf(const string &str) const {
     if (this->ns_rdf.empty())
         return str;
     return this->ns_rdf + ':' + str;
+}
+
+string Feed::atom(const string &str) const {
+    if (this->ns_atom.empty())
+        return str;
+    return this->ns_atom + ':' + str;
 }
