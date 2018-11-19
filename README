@@ -10,6 +10,15 @@ Přeložení probíhá příkazem `make`
 
 Parametry spuštění jsou popsané v souboru manual.pdf v sekci 5.2
 
+Příklad spuštění:
+
+```
+$ ./feedreader https://tools.ietf.org/dailydose/dailydose_atom.xml -u
+*** The Daily Dose of IETF ***
+The Daily Dose of IETF - Issue 3192 - 2018-09-18
+URL: https://tools.ietf.org/dailydose/3192.html
+```
+
 ## Použitá knihovna na XML: pugixml
 https://github.com/zeux/pugixml
 
@@ -18,3 +27,122 @@ knihovna se nachází ve složce lib/
 ## Rozšíření
 
 Aplikace podporuje HTTP/1.1 s Transfer-Encoding: chunked
+
+## Seznam odevzdaných souborů
+
+src/SSLWrapper.cpp
+src/debug.h
+src/utils.cpp
+src/exceptions.h
+src/Http.cpp
+src/Feed.cpp
+src/Url.h
+src/exceptions.cpp
+src/SSLWrapper.h
+src/Http.h
+src/Feed.h
+src/utils.h
+src/main.cpp
+src/Url.cpp
+Makefile
+CMakeLists.txt
+test/test.sh
+README
+manual.pdf
+test/04_basic_feeds/atom.out
+test/04_basic_feeds/rss2.0.out
+test/04_basic_feeds/rss1.0.out
+test/04_basic_feeds/rss1.0.test
+test/04_basic_feeds/rss2.0.test
+test/04_basic_feeds/rss0.91.out
+test/04_basic_feeds/rss0.91.test
+test/04_basic_feeds/atom.test
+test/03_http_errors/304.test
+test/03_http_errors/503.test
+test/03_http_errors/300.test
+test/03_http_errors/408.test
+test/03_http_errors/407.test
+test/03_http_errors/302.test
+test/03_http_errors/401.test
+test/03_http_errors/501.test
+test/03_http_errors/301.test
+test/03_http_errors/400.test
+test/03_http_errors/416.test
+test/03_http_errors/405.test
+test/03_http_errors/500.test
+test/03_http_errors/406.test
+test/03_http_errors/204.test
+test/03_http_errors/502.test
+test/03_http_errors/101.test
+test/03_http_errors/504.test
+test/03_http_errors/505.test
+test/03_http_errors/100.test
+test/03_http_errors/303.test
+test/03_http_errors/404.test
+test/03_http_errors/402.test
+test/05_feed_options/author.out
+test/05_feed_options/author.test
+test/05_feed_options/time_before_url.out
+test/05_feed_options/time_before_url.test
+test/05_feed_options/time.test
+test/05_feed_options/all_options.out
+test/05_feed_options/time_before_url_after.test
+test/05_feed_options/time.out
+test/05_feed_options/all_options.test
+test/05_feed_options/time_before_url_after.out
+test/08_atom_author_and_links/atom_authors.out
+test/08_atom_author_and_links/atom_links.out
+test/08_atom_author_and_links/atom_authors.test
+test/08_atom_author_and_links/atom_links.test
+test/01_arguments/invalid_arg.test
+test/01_arguments/multiple_urls.test
+test/01_arguments/no_args.test
+test/01_arguments/duplicate_option.test
+test/01_arguments/url_arg.test
+test/01_arguments/url_and_feedfile.test
+test/01_arguments/no_url_or_feedfile.test
+test/02_connections/the_register1.test
+test/02_connections/xkcd.test
+test/02_connections/the_register4.test
+test/02_connections/ieft2.test
+test/02_connections/seznam.test
+test/02_connections/the_register2.test
+test/02_connections/what_if_xkcd.test
+test/02_connections/the_register3.test
+test/02_connections/invalid_certificate.test
+test/02_connections/wikipedia.test
+test/02_connections/fit.test
+test/07_namespaces/rdf_no_ns.out
+test/07_namespaces/dublincore.test
+test/07_namespaces/rdf.test
+test/07_namespaces/dublincore.out
+test/07_namespaces/rdf_no_ns.test
+test/07_namespaces/rdf.out
+test/07_namespaces/dc_no_ns.out
+test/07_namespaces/dc_no_ns.test
+test/06_feedfile/no_newline.test
+test/06_feedfile/one_invalid.test
+test/06_feedfile/comments_only.test
+test/06_feedfile/no_newline.out
+test/06_feedfile/some_invalid.test
+test/06_feedfile/all_invalid.test
+test/06_feedfile/urls_only.out
+test/06_feedfile/comments_after_url.out
+test/06_feedfile/comments_after_url.test
+test/06_feedfile/empty_lines.test
+test/06_feedfile/empty.test
+test/06_feedfile/urls_only.test
+test/06_feedfile/some_invalid.out
+test/resources/feedfile_comments_only.txt
+test/resources/feedfile_one_invalid.txt
+test/resources/feedfile_urls_only.txt
+test/resources/feedfile_empty_lines.txt
+test/resources/feedfile_all_invalid.txt
+test/resources/feedfile_empty.txt
+test/resources/feedfile_comments_after_url.txt
+test/resources/feedfile_some_invalid.txt
+test/resources/feedfile_no_newline.txt
+lib/pugixml.hpp
+lib/pugixml.cpp
+lib/pugiconfig.hpp
+
