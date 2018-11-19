@@ -2,12 +2,9 @@ EXEC=feedreader
 ZIP=xomach00.zip
 TAR=xomach00.tar
 SOURCES=$(wildcard src/*)
-MISC_FILES=Makefile CMakeLists.txt test/test.sh README
+MISC_FILES=Makefile CMakeLists.txt test/test.sh README manual.pdf
 LIB_FILES=$(wildcard lib/*)
 TESTS=$(shell find test -type f -regex ".*\(test\|out\|txt\)")
-
-run: compile
-	./$(EXEC) https://xkcd.com/atom.xml
 
 compile: $(SOURCES) CMakeLists.txt
 	mkdir -p cmake-build-debug

@@ -1,5 +1,20 @@
-# ISA-VUT-BIT-2018
-Čtečka novinek ve formátu Atom s podporou TLS
+# Čtečka novinek ve formátu Atom s podporou TLS
+
+## Přeložení
+
+Pro přeložení je potřeba C++ překladač podporující alespoň standard C++11, minimální verze CMake 3.5 a knihovnu OpenSSL.
+
+Přeložení probíhá příkazem `make`
+
+## Spuštění
+
+Parametry spuštění jsou popsané v souboru manual.pdf v sekci 5.2
 
 ## Použitá knihovna na XML: pugixml
 https://github.com/zeux/pugixml
+
+knihovna se nachází ve složce lib/
+
+## Rozšíření
+
+Aplikace podporuje HTTP/1.1 s Transfer-Encoding: chunked
